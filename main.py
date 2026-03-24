@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
 Final Fixed Version - 2026-03-24
-强制生成并更新 clash_meta.yaml + 放宽过滤 + 详细日志
+强制更新 clash_meta.yaml + base64.txt + vless_subscription.txt
 """
 
 import yaml
@@ -23,7 +23,7 @@ geo_reader = None
 try:
     geo_reader = geoip2.database.Reader('GeoLite2-City.mmdb')
 except:
-    logging.warning("GeoLite2 not found")
+    logging.warning("GeoLite2-City.mmdb not found")
 
 def get_location(ip):
     if not geo_reader or not ip:
@@ -37,7 +37,6 @@ def get_location(ip):
         return "UNK"
 
 def make_fingerprint(p):
-    # 放宽去重，只用 server + port + type + uuid/password 核心字段
     key = f"{p.get('server','')}|{p.get('port','')}|{p.get('type','')}|{p.get('uuid') or p.get('password') or p.get('auth-str','')}"
     return hashlib.md5(key.lower().encode()).hexdigest()
 
@@ -63,7 +62,8 @@ def process_urls(file_path, processor, name):
             urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
         for i, url in enumerate(urls):
             try:
-                with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'}), timeout=20) as r:
+                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                with urllib.request.urlopen(req, timeout=20) as r:
                     data = r.read().decode('utf-8', errors='ignore')
                 processor(data, i)
             except Exception as e:
@@ -72,7 +72,7 @@ def process_urls(file_path, processor, name):
         logging.error(f"读取 {name} 文件失败: {e}")
     logging.info(f"{name} 本次新增节点: {len(extracted_proxies) - before}")
 
-# ==================== 处理器（放宽条件） ====================
+# ==================== 处理器 ====================
 
 def process_clash_meta(data, index):
     try:
@@ -83,8 +83,7 @@ def process_clash_meta(data, index):
                 continue
             p = dict(p)
             fp = make_fingerprint(p)
-            if fp in servers_list:
-                continue
+            if fp in servers_list: continue
             p['name'] = normalize_name(p, index, i)
             extracted_proxies.append(p)
             servers_list.append(fp)
@@ -134,7 +133,6 @@ def process_hysteria2(data, index):
         logging.error(f"Hysteria2 处理异常 {index}: {e}")
 
 def process_xray_singbox(data, index):
-    # 简化版，保留基本提取（可后续再完善）
     try:
         c = json.loads(data)
         outs = c.get('outbounds', []) or c.get('proxies', [])
@@ -165,6 +163,7 @@ if __name__ == "__main__":
     os.makedirs("outputs", exist_ok=True)
 
     logging.info("=== 开始提取节点 ===")
+
     process_urls("urls/clash_meta_urls.txt", process_clash_meta, "Clash Meta")
     process_urls("urls/hysteria_urls.txt", process_hysteria, "Hysteria")
     process_urls("urls/hysteria2_urls.txt", process_hysteria2, "Hysteria2")
@@ -172,10 +171,51 @@ if __name__ == "__main__":
     process_urls("urls/singbox_urls.txt", process_xray_singbox, "Sing-box")
     process_urls("urls/ss_urls.txt", process_xray_singbox, "SS")
 
-    logging.info(f"总共提取到 {len(extracted_proxies)} 个有效节点")
+    total = len(extracted_proxies)
+    logging.info(f"总共提取到 {total} 个有效节点")
 
-    # 强制生成并覆盖 clash_meta.yaml
+    # ==================== 强制更新全部 3 个文件 ====================
+
+    # 1. clash_meta.yaml
     with open("outputs/clash_meta.yaml", "w", encoding="utf-8") as f:
         yaml.dump({"proxies": extracted_proxies}, f, allow_unicode=True, sort_keys=False)
+    logging.info("✅ clash_meta.yaml 已更新")
 
-    logging.info("clash_meta.yaml 已强制生成/更新！请检查 outputs/ 目录")
+    # 2. base64.txt
+    all_links = []
+    for p in extracted_proxies:
+        typ = p.get('type', '').lower()
+        name = p.get('name', 'node')
+        if typ == 'vless':
+            link = (f"vless://{p.get('uuid')}@{p['server']}:{p['port']}?"
+                    f"type={p.get('network','tcp')}&security={'tls' if p.get('tls') else 'none'}"
+                    f"&sni={p.get('servername','')}&fp=chrome&alpn=h3,http/1.1&allowInsecure=1"
+                    f"#{name}")
+            all_links.append(link)
+        elif typ == 'hysteria2':
+            link = f"hysteria2://{p.get('password')}@{p['server']}:{p['port']}?insecure=1&sni={p.get('sni','')}#{name}"
+            all_links.append(link)
+        elif typ == 'hysteria':
+            link = f"hy://{p.get('auth-str', p.get('password', ''))}@{p['server']}:{p['port']}?insecure=1&sni={p.get('sni','')}#{name}"
+            all_links.append(link)
+        elif typ == 'ss':
+            userinfo = f"{p.get('cipher', 'aes-256-gcm')}:{p.get('password')}"
+            link = f"ss://{base64.b64encode(userinfo.encode()).decode()}@{p['server']}:{p['port']}#{name}"
+            all_links.append(link)
+
+    with open("outputs/base64.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(all_links))
+    logging.info(f"✅ base64.txt 已更新 ({len(all_links)} 条链接)")
+
+    # 3. vless_subscription.txt（单个 base64 订阅）
+    vless_links = [ln for ln in all_links if ln.startswith("vless://")]
+    with open("outputs/vless_subscription.txt", "w", encoding="utf-8") as f:
+        if vless_links:
+            encoded = base64.b64encode("\n".join(vless_links).encode()).decode()
+            f.write(encoded)
+            logging.info(f"✅ vless_subscription.txt 已更新 ({len(vless_links)} 条 VLESS)")
+        else:
+            f.write("")
+            logging.info("ℹ️ vless_subscription.txt 为空（无 VLESS 节点）")
+
+    logging.info("=== 全部 3 个输出文件已强制更新完成 ===")
