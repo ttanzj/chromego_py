@@ -253,7 +253,7 @@ proxies:
   password: dongtaiwang.com
   sni: www.bing.com
   skip-cert-verify: true
-  server-ports: 28000-29000
+  ports: 28000-29000
 - name: Y-DE-Frankfurt am Main-HYSTERIA-1
   type: hysteria
   server: 2a10:3c80:0:f::2
