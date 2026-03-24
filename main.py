@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
-最终修复版 - 彻底解决 Hysteria/Hysteria2 跳跃端口问题
+稳定最终版 - 解决 NekoBox 跳跃端口识别问题 + 完整 Hysteria1 参数
 Y系列 → sources.txt (前缀 Y-)
 Z系列 → sources-j.txt (前缀 Z-)
 """
@@ -37,20 +37,18 @@ def get_location(ip):
         return "UNK"
 
 def make_fingerprint(p):
-    key = f"{p.get('server','')}|{p.get('port','')}|{p.get('type','')}|{p.get('uuid') or p.get('password') or p.get('auth-str','')}"
+    key = f"{p.get('server','')}|{p.get('port','')}|{p.get('type','')}|{p.get('password') or p.get('auth-str','')}"
     return hashlib.md5(key.lower().encode()).hexdigest()
 
 def parse_server_port(srv):
-    """智能解析主端口和跳跃端口"""
     srv = str(srv).strip()
     main_port = 443
     ports_range = None
 
-    # 处理 "ip:27921,28000-29000" 或 "[ip]:27921,28000-29000"
     if ',' in srv:
-        parts = [part.strip() for part in srv.split(',')]
+        parts = [p.strip() for p in srv.split(',')]
         main_part = parts[0]
-        if '-' in parts[-1]:
+        if len(parts) > 1 and '-' in parts[-1]:
             ports_range = parts[-1]
         srv = main_part
 
@@ -119,13 +117,19 @@ def process_json(data, prefix):
                     "name": f"{prefix}{get_location(server)}-{typ.upper()}-{i+1}",
                     "type": typ,
                     "server": server,
-                    "port": main_port,                    # 主端口
+                    "port": main_port,                       # 主端口
                     "password": content.get('auth') or content.get('password', content.get('auth_str', '')),
-                    "sni": content.get('sni') or (content.get('tls') or {}).get('sni', ''),
-                    "skip-cert-verify": True
+                    "sni": content.get('sni') or content.get('peer') or content.get('server_name', ''),
+                    "skip-cert-verify": content.get('insecure', True),
+                    "alpn": content.get('alpn', ['h3'])[0] if isinstance(content.get('alpn'), list) else content.get('alpn', 'h3')
                 }
                 
-                # 关键修复：跳跃端口使用 Clash Meta 标准字段 "ports"
+                # Hysteria1 特有参数
+                if typ == "hysteria":
+                    p["up"] = content.get('upmbps') or content.get('up') or 100
+                    p["down"] = content.get('downmbps') or content.get('down') or 100
+                
+                # 跳跃端口 - 使用 Clash Meta 标准字段 "ports"
                 if ports_range:
                     p['ports'] = ports_range
                 elif content.get('server_ports'):
