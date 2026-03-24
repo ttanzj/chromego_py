@@ -253,6 +253,7 @@ proxies:
   password: dongtaiwang.com
   sni: www.bing.com
   skip-cert-verify: true
+  server-ports: 28000-29000
 - name: Y-DE-Frankfurt am Main-HYSTERIA-1
   type: hysteria
   server: 2a10:3c80:0:f::2
@@ -281,7 +282,7 @@ proxies:
   password: dongtaiwang.com
   sni: bing.com
   skip-cert-verify: true
-- name: J-IR-VLESS-1
+- name: Z-IR-VLESS-1
   server: 31.58.50.225
   port: 8443
   type: vless
@@ -297,7 +298,7 @@ proxies:
     headers:
       Host: snippet.chinav.eu.cc
   udp: true
-- name: J-AT-VLESS-2
+- name: Z-AT-VLESS-2
   server: 152.53.80.40
   port: 443
   type: vless
@@ -311,7 +312,7 @@ proxies:
     public-key: W-zf_ncm9sYALF5EqvUsxqTkYGdAw-tQczT2SqwVMGE
     short-id: ff776ff77be48b88
   udp: true
-- name: J-US-VLESS-3
+- name: Z-US-VLESS-3
   server: 159.13.36.110
   port: 2443
   type: vless
@@ -325,7 +326,7 @@ proxies:
     public-key: uzRnmrb_UXbDNz5_IeFrC-PJfnuoUIsyaSEy1FgdPho
     short-id: ae377cba
   udp: true
-- name: J-UNK-TROJAN-4
+- name: Z-UNK-TROJAN-4
   server: enhanced-crayfish.rooster465.autos
   port: 443
   type: trojan
@@ -333,7 +334,7 @@ proxies:
   sni: enhanced-crayfish.rooster465.autos
   skip-cert-verify: false
   udp: true
-- name: J-CN-VLESS-5
+- name: Z-CN-VLESS-5
   server: 138.124.104.221
   port: 443
   type: vless
@@ -347,7 +348,7 @@ proxies:
     public-key: iCY6H8CpnIfqmIkEABduJEAeJrnYS089R1-jKEyVp3w
     short-id: e043995937
   udp: true
-- name: J-CZ-VLESS-6
+- name: Z-CZ-VLESS-6
   server: 194.87.245.253
   port: 443
   type: vless
@@ -361,7 +362,7 @@ proxies:
     headers:
       Host: snippet.danfeng.kozow.com
   udp: true
-- name: J-US-Chicago-VLESS-7
+- name: Z-US-Chicago-VLESS-7
   server: 45.145.42.170
   port: 8005
   type: vless
@@ -375,7 +376,7 @@ proxies:
     headers:
       Host: sub.mot.ip-ddns.com
   udp: true
-- name: J-BG-Burgas-VLESS-8
+- name: Z-BG-Burgas-VLESS-8
   server: 94.156.116.254
   port: 51198
   type: vless
@@ -392,7 +393,7 @@ proxies:
     headers:
       Host: snippet.fgfw.de5.net
   udp: true
-- name: J-GB-Slough-VLESS-9
+- name: Z-GB-Slough-VLESS-9
   server: 152.67.158.177
   port: 2443
   type: vless
@@ -406,7 +407,7 @@ proxies:
     public-key: 498LE1B8NFnfagrOnGGmuh80KqgKXMKiHbgcpxRqBB0
     short-id: 2d989d13dba1
   udp: true
-- name: J-HK-VLESS-10
+- name: Z-HK-VLESS-10
   server: 203.168.131.110
   port: 3389
   type: vless
@@ -423,7 +424,7 @@ proxies:
     headers:
       Host: snippet.chinav.eu.cc
   udp: true
-- name: J-IE-Dublin-VLESS-12
+- name: Z-IE-Dublin-VLESS-12
   server: 20.67.254.104
   port: 443
   type: vless
@@ -440,7 +441,7 @@ proxies:
     headers:
       Host: snippet.chinat.eu.cc
   udp: true
-- name: J-HK-VLESS-13
+- name: Z-HK-VLESS-13
   server: 62.60.237.240
   port: 443
   type: vless
@@ -453,7 +454,7 @@ proxies:
     public-key: RravQN06gzsNsm5ojEhZGrxBgLGEpqEThtHEltdjpBk
     short-id: b3d76d
   udp: true
-- name: J-JP-VLESS-14
+- name: Z-JP-VLESS-14
   server: 103.214.168.247
   port: 39738
   type: vless
@@ -468,7 +469,7 @@ proxies:
     headers:
       Host: snippet.fgfw.de5.net
   udp: true
-- name: J-JP-Osaka-VLESS-15
+- name: Z-JP-Osaka-VLESS-15
   server: 217.142.227.120
   port: 2443
   type: vless
@@ -482,7 +483,7 @@ proxies:
     public-key: u8FFKKLif3K14_SqiDEF834Rpp4zETdOYt2mFrrsSnQ
     short-id: b15116d00de0
   udp: true
-- name: J-UNK-VLESS-16
+- name: Z-UNK-VLESS-16
   server: krp01.jumperservice.com
   port: 19001
   type: vless
@@ -495,7 +496,7 @@ proxies:
   reality-opts:
     public-key: UtL7E0Gmxj3X5JdcPAutpTRKo7K2hugkR0vwk2XroUM
   udp: true
-- name: J-UNK-VLESS-17
+- name: Z-UNK-VLESS-17
   server: krp01.jumperservice.com
   port: 19001
   type: vless
@@ -508,7 +509,7 @@ proxies:
   reality-opts:
     public-key: UtL7E0Gmxj3X5JdcPAutpTRKo7K2hugkR0vwk2XroUM
   udp: true
-- name: J-KR-Yongsan-gu-VLESS-18
+- name: Z-KR-Yongsan-gu-VLESS-18
   server: 220.71.1.32
   port: 20201
   type: vless
@@ -523,7 +524,7 @@ proxies:
     headers:
       Host: itz4m3m5v7.chinav.indevs.in
   udp: true
-- name: J-KR-Saha-gu-VLESS-19
+- name: Z-KR-Saha-gu-VLESS-19
   server: 211.193.169.223
   port: 37810
   type: vless
@@ -540,7 +541,7 @@ proxies:
     headers:
       Host: snippet.fgfw.de5.net
   udp: true
-- name: J-KR-Suyeong-gu-VLESS-20
+- name: Z-KR-Suyeong-gu-VLESS-20
   server: 121.174.43.148
   port: 12345
   type: vless
@@ -557,7 +558,7 @@ proxies:
     headers:
       Host: snippet.chinat.eu.cc
   udp: true
-- name: J-KR-Goyang-si-TROJAN-21
+- name: Z-KR-Goyang-si-TROJAN-21
   server: 211.110.32.47
   port: 20000
   type: trojan
@@ -570,7 +571,7 @@ proxies:
     headers:
       Host: jflsjlaf.pages.dev
   udp: true
-- name: J-KR-Gangneung-VLESS-22
+- name: Z-KR-Gangneung-VLESS-22
   server: 222.113.18.207
   port: 16993
   type: vless
@@ -585,7 +586,7 @@ proxies:
     headers:
       Host: snippet.fgfw.de5.net
   udp: true
-- name: J-KR-Haeundae-gu-VLESS-23
+- name: Z-KR-Haeundae-gu-VLESS-23
   server: 106.251.70.75
   port: 10162
   type: vless
@@ -602,7 +603,7 @@ proxies:
     headers:
       Host: snippet.chinav.eu.cc
   udp: true
-- name: J-KR-Gimhae-VLESS-24
+- name: Z-KR-Gimhae-VLESS-24
   server: 175.199.169.221
   port: 50006
   type: vless
@@ -619,7 +620,7 @@ proxies:
     headers:
       Host: snippet.fgfw.de5.net
   udp: true
-- name: J-KR-Yongin-si-VLESS-25
+- name: Z-KR-Yongin-si-VLESS-25
   server: 121.152.61.147
   port: 11371
   type: vless
@@ -634,7 +635,7 @@ proxies:
     headers:
       Host: snippet.fgfw.de5.net
   udp: true
-- name: J-KR-Nam-gu-TROJAN-26
+- name: Z-KR-Nam-gu-TROJAN-26
   server: 118.35.208.37
   port: 11434
   type: trojan
@@ -647,7 +648,7 @@ proxies:
     headers:
       Host: jflsjlaf.pages.dev
   udp: true
-- name: J-KR-Seoul-VLESS-27
+- name: Z-KR-Seoul-VLESS-27
   server: 140.238.11.149
   port: 2443
   type: vless
@@ -661,14 +662,14 @@ proxies:
     public-key: BmqEE16ux216I-WcezMLroZxIoV09PfeMS-xhyfWTVs
     short-id: ff93655f5d
   udp: true
-- name: J-RU-TROJAN-28
+- name: Z-RU-TROJAN-28
   server: 89.221.225.71
   port: 443
   type: trojan
   password: 3ac6a6ca99f74941b1eaf892818e2ddb
   skip-cert-verify: true
   udp: true
-- name: J-UNK-TROJAN-29
+- name: Z-UNK-TROJAN-29
   server: outgoing-ladybird.rooster465.autos
   port: 443
   type: trojan
@@ -676,14 +677,14 @@ proxies:
   sni: outgoing-ladybird.rooster465.autos
   skip-cert-verify: false
   udp: true
-- name: J-UNK-TROJAN-30
+- name: Z-UNK-TROJAN-30
   server: fluent-stingray.crayfish192.xyz
   port: 443
   type: trojan
   password: IL37892054
   skip-cert-verify: true
   udp: true
-- name: J-RU-Moscow-VLESS-33
+- name: Z-RU-Moscow-VLESS-33
   server: 193.9.49.65
   port: 443
   type: vless
@@ -697,28 +698,28 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-SG-TROJAN-34
+- name: Z-SG-TROJAN-34
   server: 185.151.146.40
   port: 443
   type: trojan
   password: 3ac6a6ca99f74941b1eaf892818e2ddb
   skip-cert-verify: true
   udp: true
-- name: J-SG-Singapore-SS-35
+- name: Z-SG-Singapore-SS-35
   server: 68.183.227.4
   port: 8080
   type: ss
   cipher: rc4-md5
   password: 14fFPrbezE3HDZzsMOr6
   udp: true
-- name: J-TW-TROJAN-36
+- name: Z-TW-TROJAN-36
   server: 85.237.206.249
   port: 443
   type: trojan
   password: 3ac6a6ca99f74941b1eaf892818e2ddb
   skip-cert-verify: true
   udp: true
-- name: J-UNK-VLESS-37
+- name: Z-UNK-VLESS-37
   server: www.npmjs.com
   port: 2095
   type: vless
@@ -733,7 +734,7 @@ proxies:
     headers:
       Host: fuckingfangbinxing.cnm-fangbinxing-nmsl-ccc.workers.dev
   udp: true
-- name: J-UNK-VLESS-38
+- name: Z-UNK-VLESS-38
   server: www.udemy.com
   port: 2095
   type: vless
@@ -748,7 +749,7 @@ proxies:
     headers:
       Host: fuckingfangbinxing.cnm-fangbinxing-nmsl-ccc.workers.dev
   udp: true
-- name: J-US-TROJAN-39
+- name: Z-US-TROJAN-39
   server: 54.46.72.234
   port: 8025
   type: trojan
@@ -761,7 +762,7 @@ proxies:
     headers:
       Host: jflsjlaf.pages.dev
   udp: true
-- name: J-US-VLESS-40
+- name: Z-US-VLESS-40
   server: 172.64.229.85
   port: 443
   type: vless
@@ -775,7 +776,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-UNK-VLESS-41
+- name: Z-UNK-VLESS-41
   server: ns.cloudflare.com
   port: 2095
   type: vless
@@ -790,7 +791,7 @@ proxies:
     headers:
       Host: fuckingfangbinxing.cnm-fangbinxing-nmsl-ccc.workers.dev
   udp: true
-- name: J-UNK-VLESS-42
+- name: Z-UNK-VLESS-42
   server: www.wto.org
   port: 2095
   type: vless
@@ -805,7 +806,7 @@ proxies:
     headers:
       Host: fuckingfangbinxing.cnm-fangbinxing-nmsl-ccc.workers.dev
   udp: true
-- name: J-UNK-VLESS-43
+- name: Z-UNK-VLESS-43
   server: 162.159.38.78
   port: 443
   type: vless
@@ -819,7 +820,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-UNK-VLESS-44
+- name: Z-UNK-VLESS-44
   server: 162.159.24.111
   port: 443
   type: vless
@@ -833,7 +834,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-UNK-VLESS-45
+- name: Z-UNK-VLESS-45
   server: malaysia01.jumperservice.com
   port: 19001
   type: vless
@@ -846,7 +847,7 @@ proxies:
   reality-opts:
     public-key: qhTzYYIgBzDLNYR79oxftqdo1kzL-1_hGJKfqrOliCY
   udp: true
-- name: J-UNK-VLESS-46
+- name: Z-UNK-VLESS-46
   server: 162.159.7.2
   port: 443
   type: vless
@@ -861,7 +862,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-US-VLESS-47
+- name: Z-US-VLESS-47
   server: 172.64.229.165
   port: 443
   type: vless
@@ -875,7 +876,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-UNK-VLESS-48
+- name: Z-UNK-VLESS-48
   server: www.visa.cn
   port: 443
   type: vless
@@ -889,7 +890,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-US-VLESS-49
+- name: Z-US-VLESS-49
   server: 192.0.54.131
   port: 443
   type: vless
@@ -903,7 +904,7 @@ proxies:
     headers:
       Host: snippet.danfeng.kozow.com
   udp: true
-- name: J-US-VLESS-50
+- name: Z-US-VLESS-50
   server: 192.0.63.230
   port: 443
   type: vless
@@ -917,7 +918,7 @@ proxies:
     headers:
       Host: snippet.danfeng.kozow.com
   udp: true
-- name: J-US-VLESS-51
+- name: Z-US-VLESS-51
   server: 192.0.63.56
   port: 443
   type: vless
@@ -931,7 +932,7 @@ proxies:
     headers:
       Host: snippet.danfeng.kozow.com
   udp: true
-- name: J-US-VLESS-52
+- name: Z-US-VLESS-52
   server: 192.0.54.225
   port: 443
   type: vless
@@ -945,7 +946,7 @@ proxies:
     headers:
       Host: snippet.danfeng.kozow.com
   udp: true
-- name: J-US-VLESS-53
+- name: Z-US-VLESS-53
   server: 192.0.63.134
   port: 443
   type: vless
@@ -959,7 +960,7 @@ proxies:
     headers:
       Host: snippet.danfeng.kozow.com
   udp: true
-- name: J-US-VLESS-54
+- name: Z-US-VLESS-54
   server: 192.0.54.188
   port: 443
   type: vless
@@ -973,7 +974,7 @@ proxies:
     headers:
       Host: snippet.danfeng.kozow.com
   udp: true
-- name: J-UNK-VLESS-55
+- name: Z-UNK-VLESS-55
   server: 104.17.155.101
   port: 443
   type: vless
@@ -988,7 +989,7 @@ proxies:
     headers:
       Host: wu.090881.xyz
   udp: true
-- name: J-US-VLESS-56
+- name: Z-US-VLESS-56
   server: 172.64.156.0
   port: 443
   type: vless
@@ -1002,7 +1003,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-UNK-VLESS-57
+- name: Z-UNK-VLESS-57
   server: vip1.kaixincloud.top
   port: 443
   type: vless
@@ -1017,7 +1018,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-UNK-VLESS-59
+- name: Z-UNK-VLESS-59
   server: 162.159.44.142
   port: 443
   type: vless
@@ -1032,7 +1033,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-US-VLESS-60
+- name: Z-US-VLESS-60
   server: 159.54.185.35
   port: 2443
   type: vless
@@ -1046,14 +1047,14 @@ proxies:
     public-key: Rp0axdMMyjBY3su8yFECX1rMCcg90y0HcCHalmxs73Y
     short-id: 494cf2
   udp: true
-- name: J-US-Los Angeles-TROJAN-65
+- name: Z-US-Los Angeles-TROJAN-65
   server: 77.247.126.137
   port: 443
   type: trojan
   password: 3ac6a6ca99f74941b1eaf892818e2ddb
   skip-cert-verify: true
   udp: true
-- name: J-UNK-VLESS-66
+- name: Z-UNK-VLESS-66
   server: node-nl-main.amnesia.pw
   port: 443
   type: vless
@@ -1066,7 +1067,7 @@ proxies:
   reality-opts:
     public-key: I69t4VQEvCY-NlQuMVHGggvJ2aNo18gWstkmA-uQWxE
   udp: true
-- name: J-US-Providence-VLESS-67
+- name: Z-US-Providence-VLESS-67
   server: 157.254.223.44
   port: 18959
   type: vless
@@ -1079,14 +1080,14 @@ proxies:
     public-key: -hwVEdgFkvjku8ESuDoAA7id5yGGv_zXBvBW_RdhmHA
     short-id: d557c6895d014075
   udp: true
-- name: J-US-New York-TROJAN-68
+- name: Z-US-New York-TROJAN-68
   server: 194.33.45.157
   port: 443
   type: trojan
   password: 3ac6a6ca99f74941b1eaf892818e2ddb
   skip-cert-verify: true
   udp: true
-- name: J-US-VLESS-69
+- name: Z-US-VLESS-69
   server: 143.14.22.98
   port: 8443
   type: vless
@@ -1103,7 +1104,7 @@ proxies:
     headers:
       Host: snippet.chinat.eu.cc
   udp: true
-- name: J-US-VLESS-70
+- name: Z-US-VLESS-70
   server: 192.200.160.20
   port: 443
   type: vless
@@ -1117,7 +1118,7 @@ proxies:
     headers:
       Host: 639073677243791121.camry-perma.info
   udp: true
-- name: J-UNK-VLESS-4
+- name: Z-UNK-VLESS-4
   server: 162.159.48.142
   port: 443
   type: vless
@@ -1130,7 +1131,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-UNK-VLESS-5
+- name: Z-UNK-VLESS-5
   server: alist.sm.uy
   port: 443
   type: vless
@@ -1143,7 +1144,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-US-VLESS-6
+- name: Z-US-VLESS-6
   server: 172.64.52.81
   port: 443
   type: vless
@@ -1156,7 +1157,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-US-VLESS-7
+- name: Z-US-VLESS-7
   server: 108.162.195.58
   port: 443
   type: vless
@@ -1169,7 +1170,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-US-TROJAN-10
+- name: Z-US-TROJAN-10
   server: 172.66.44.230
   port: 8443
   type: trojan
@@ -1181,7 +1182,7 @@ proxies:
     headers:
       Host: Koma-YT.PAGeS.Dev
   udp: true
-- name: J-UNK-VMESS-13
+- name: Z-UNK-VMESS-13
   server: v10.hdacd.com
   port: 30807
   type: vmess
@@ -1191,7 +1192,7 @@ proxies:
   tls: false
   skip-cert-verify: false
   udp: true
-- name: J-UNK-SS-15
+- name: Z-UNK-SS-15
   server: cf.090227.xyz
   port: 443
   type: ss
@@ -1205,7 +1206,7 @@ proxies:
     tls: true
     mux: false
   udp: true
-- name: J-UNK-SS-16
+- name: Z-UNK-SS-16
   server: cf.130519.xyz
   port: 443
   type: ss
@@ -1219,7 +1220,7 @@ proxies:
     tls: true
     mux: false
   udp: true
-- name: J-UNK-SS-17
+- name: Z-UNK-SS-17
   server: cf.zhetengsha.eu.org
   port: 443
   type: ss
@@ -1233,7 +1234,7 @@ proxies:
     tls: true
     mux: false
   udp: true
-- name: J-UNK-SS-18
+- name: Z-UNK-SS-18
   server: store.ubi.com
   port: 443
   type: ss
@@ -1247,7 +1248,7 @@ proxies:
     tls: true
     mux: false
   udp: true
-- name: J-UNK-SS-19
+- name: Z-UNK-SS-19
   server: sub.danfeng.eu.org
   port: 443
   type: ss
@@ -1261,7 +1262,7 @@ proxies:
     tls: true
     mux: false
   udp: true
-- name: J-UNK-SS-20
+- name: Z-UNK-SS-20
   server: cdns.doon.eu.org
   port: 443
   type: ss
@@ -1275,7 +1276,7 @@ proxies:
     tls: true
     mux: false
   udp: true
-- name: J-SE-Stockholm-SS-23
+- name: Z-SE-Stockholm-SS-23
   server: 51.20.160.11
   port: 443
   type: ss
@@ -1289,7 +1290,7 @@ proxies:
     tls: true
     mux: false
   udp: true
-- name: J-US-VLESS-24
+- name: Z-US-VLESS-24
   server: 192.200.160.20
   port: 443
   type: vless
@@ -1305,7 +1306,7 @@ proxies:
     headers:
       Host: 639073677243249982.camry-perma.info
   udp: true
-- name: J-UNK-VLESS-28
+- name: Z-UNK-VLESS-28
   server: vip2.kaixincloud.top
   port: 443
   type: vless
@@ -1319,7 +1320,7 @@ proxies:
     headers:
       Host: r.icy.de5.net
   udp: true
-- name: J-US-VLESS-30
+- name: Z-US-VLESS-30
   server: 192.200.160.20
   port: 443
   type: vless
@@ -1335,14 +1336,14 @@ proxies:
     headers:
       Host: 639073677243557970.camry-perma.info
   udp: true
-- name: J-VN-Hai Duong-SS-31
+- name: Z-VN-Hai Duong-SS-31
   server: 103.186.155.19
   port: 38388
   type: ss
   cipher: aes-256-cfb
   password: Xn8jKdmDM00IeO%#$#fJAMtsEAEUOpH/YWYtYqDFnT0SV
   udp: true
-- name: J-TR-ANYTLS-32
+- name: Z-TR-ANYTLS-32
   server: 45.221.98.14
   port: 59901
   type: anytls
