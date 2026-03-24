@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
 """
-最优最终版 main.py
+最终版 main.py
+- sources.txt  → Y系列
+- sources-j.txt → J系列
+- 修复 Hysteria/Hysteria2 跳跃端口问题
 - 只输出 clash_meta.yaml
-- sources.txt 统一管理所有源
-- Y- = 最初 Alvin9999 源
-- J- = backup/img 补充源
 """
 
 import yaml
@@ -54,35 +54,27 @@ def parse_server_port(srv):
             return parts[0], int(parts[1])
     return srv, 443
 
-def process_urls():
+def process_file(file_path, prefix):
     try:
-        with open("urls/sources.txt", 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+        with open(file_path, 'r', encoding='utf-8') as f:
+            urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
         
-        for line_num, line in enumerate(lines):
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-
-            # 判断 Y 系列还是 J 系列
-            is_y = any(x in line for x in ["Alvin9999/pac2", "free9999/ipupdate", "githubip.xyz", "gitlabip.xyz/Alvin9999/pac2"])
-            prefix = "Y-" if is_y else "J-"
-
+        for url in urls:
             try:
-                req = urllib.request.Request(line, headers={'User-Agent': 'Mozilla/5.0'})
+                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
                 with urllib.request.urlopen(req, timeout=25) as resp:
                     data = resp.read().decode('utf-8', errors='ignore')
 
-                if line.endswith(('.yaml', '.yml')):
+                if url.endswith(('.yaml', '.yml')):
                     process_clash(data, prefix)
                 else:
                     process_json(data, prefix)
 
-                logging.info(f"✓ 处理完成 [{line_num+1}]: {line}")
+                logging.info(f"✓ {prefix}系列 处理完成: {url}")
             except Exception as e:
-                logging.error(f"✗ 处理失败 [{line_num+1}]: {line} → {e}")
+                logging.error(f"✗ {prefix}系列 处理失败 {url}: {e}")
     except Exception as e:
-        logging.error(f"读取 sources.txt 失败: {e}")
+        logging.error(f"读取 {file_path} 失败: {e}")
 
 def process_clash(data, prefix):
     try:
@@ -103,14 +95,17 @@ def process_clash(data, prefix):
 def process_json(data, prefix):
     try:
         content = json.loads(data)
-        # hysteria / hysteria2 / xray / singbox 等通用处理
+        
+        # Hysteria / Hysteria2 处理（重点修复跳跃端口）
         if 'server' in content or 'servers' in content:
             servers = content.get('server') or content.get('servers', [])
             if isinstance(servers, str): servers = [servers]
             typ = "hysteria2" if "hysteria2" in str(content).lower() else "hysteria"
+            
             for i, s in enumerate(servers):
                 if not s: continue
                 server, port = parse_server_port(s)
+                
                 p = {
                     "name": f"{prefix}{get_location(server)}-{typ.upper()}-{i+1}",
                     "type": typ,
@@ -120,16 +115,21 @@ def process_json(data, prefix):
                     "sni": content.get('sni') or (content.get('tls') or {}).get('sni', ''),
                     "skip-cert-verify": True
                 }
+                
+                # 修复跳跃端口（常见于 Hysteria2）
+                if 'server_ports' in content or isinstance(port, str) and '-' in str(port):
+                    p['server_ports'] = content.get('server_ports', '28000-29000')
+                
                 fp = make_fingerprint(p)
                 if fp not in servers_list:
                     extracted_proxies.append(p)
                     servers_list.append(fp)
 
-        # outbounds 处理（xray / singbox 等）
+        # outbounds 处理
         for ob in content.get('outbounds', []):
             if not isinstance(ob, dict): continue
             proto = (ob.get('protocol') or ob.get('type') or '').lower()
-            if proto not in ('vless', 'vmess', 'trojan', 'ss', 'shadowsocks'): continue
+            if proto not in ('vless', 'vmess', 'trojan', 'ss', 'hysteria', 'hysteria2'): continue
             settings = ob.get('settings', ob)
             server = settings.get('address') or settings.get('server')
             if not server: continue
@@ -137,9 +137,6 @@ def process_json(data, prefix):
             p = {"server": server, "port": port, "type": proto}
             if proto == 'vless':
                 p['uuid'] = settings.get('users', [{}])[0].get('id')
-            elif proto in ('ss', 'shadowsocks'):
-                p['password'] = settings.get('password')
-                p['cipher'] = settings.get('method', 'aes-256-gcm')
             p['name'] = f"{prefix}{get_location(server)}-{proto.upper()}-{len(extracted_proxies)+1}"
             fp = make_fingerprint(p)
             if fp not in servers_list:
@@ -148,12 +145,15 @@ def process_json(data, prefix):
     except Exception as e:
         logging.error(f"JSON 处理异常: {e}")
 
-# ====================== 主程序 ======================
 if __name__ == "__main__":
     os.makedirs("outputs", exist_ok=True)
 
-    logging.info("=== 开始处理所有节点源（Y系列 + J系列） ===")
-    process_urls()
+    logging.info("=== 开始提取节点 ===")
+    logging.info("处理 Y系列 (sources.txt)")
+    process_file("urls/sources.txt", "Y-")
+    
+    logging.info("处理 J系列 (sources-j.txt)")
+    process_file("urls/sources-j.txt", "J-")
 
     logging.info(f"总共提取到 {len(extracted_proxies)} 个有效节点")
 
@@ -161,4 +161,3 @@ if __name__ == "__main__":
         yaml.dump({"proxies": extracted_proxies}, f, allow_unicode=True, sort_keys=False)
 
     logging.info("✅ clash_meta.yaml 已成功生成并更新！")
-    logging.info("输出路径：outputs/clash_meta.yaml")
