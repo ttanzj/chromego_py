@@ -1,1 +1,0 @@
-vless://26c462ba-a90c-4814-9d7c-a629bc0bdb5c@2001:bc8:32d7:302::13:34324?type=tcp&security=tls&sni=dash.cloudflare.com&flow=xtls-rprx-vision&fp=chrome# FR-VLESS | 1
