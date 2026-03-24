@@ -1,10 +1,8 @@
 # -*- coding: UTF-8 -*-
 """
-最终版 main.py
-- sources.txt     → Y系列（节点名前缀 Y-）
-- sources-j.txt   → Z系列（节点名前缀 Z-）
-- 优化 Hysteria/Hysteria2 跳跃端口处理
-- 只输出 clash_meta.yaml
+最终完善版 - 正确处理 Hysteria2 跳跃端口
+Y系列 → sources.txt （前缀 Y-）
+Z系列 → sources-j.txt （前缀 Z-）
 """
 
 import yaml
@@ -55,7 +53,6 @@ def parse_server_port(srv):
     return srv, 443
 
 def process_file(file_path, prefix):
-    """prefix 为显示前缀：Y- 或 Z-"""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
@@ -110,24 +107,33 @@ def process_json(data, prefix):
                     "name": f"{prefix}{get_location(server)}-{typ.upper()}-{i+1}",
                     "type": typ,
                     "server": server,
-                    "port": main_port,                    # 主端口
+                    "port": main_port,                    # 主端口保持 27921
                     "password": content.get('auth') or content.get('password', content.get('auth_str', '')),
                     "sni": content.get('sni') or (content.get('tls') or {}).get('sni', ''),
                     "skip-cert-verify": True
                 }
                 
-                # 修复跳跃端口
-                if content.get('server_ports') or content.get('hop_ports'):
-                    p['server-ports'] = content.get('server_ports') or content.get('hop_ports')
-                elif isinstance(s, str) and ',' in s and '-' in s.split(',')[-1]:
-                    p['server-ports'] = s.split(',')[-1].strip()
+                # ==================== 关键修复：跳跃端口 ====================
+                server_ports = None
+                if content.get('server_ports'):
+                    server_ports = content.get('server_ports')
+                elif content.get('hop_ports'):
+                    server_ports = content.get('hop_ports')
+                elif isinstance(s, str) and ',' in s:
+                    # 处理类似 27921,28000-29000 的情况
+                    parts = s.split(',')
+                    if len(parts) > 1 and '-' in parts[-1]:
+                        server_ports = parts[-1].strip()
+                
+                if server_ports:
+                    p['server-ports'] = server_ports   # Clash Meta 标准字段
                 
                 fp = make_fingerprint(p)
                 if fp not in servers_list:
                     extracted_proxies.append(p)
                     servers_list.append(fp)
 
-        # outbounds 处理
+        # outbounds 处理（保留）
         for ob in content.get('outbounds', []):
             if not isinstance(ob, dict): continue
             proto = (ob.get('protocol') or ob.get('type') or '').lower()
@@ -152,7 +158,7 @@ if __name__ == "__main__":
 
     logging.info("=== 开始提取节点 ===")
     process_file("urls/sources.txt", "Y-")
-    process_file("urls/sources-j.txt", "Z-")   # 这里改为 Z-
+    process_file("urls/sources-j.txt", "Z-")
 
     logging.info(f"总共提取到 {len(extracted_proxies)} 个有效节点")
 
