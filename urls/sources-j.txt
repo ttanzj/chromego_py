@@ -1,2 +1,6 @@
 # J系列 - Grok推荐的活跃源
-
+https://raw.githubusercontent.com/anaer/Sub/main/clash.yaml
+https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml
+https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/filtered/subs/hysteria2.txt
+https://raw.githubusercontent.com/Surfboardv2ray/TGParse/main/python/hysteria2
+https://raw.githubusercontent.com/mfuu/v2ray/master/clash.yaml
