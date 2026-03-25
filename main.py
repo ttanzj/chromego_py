@@ -1,11 +1,8 @@
 # -*- coding: UTF-8 -*-
 """
-最后一版微调 - 按要求处理跳跃端口
-有跳跃端口的节点：
-  - port  = 跳跃端口范围（如 28000-29000）
-  - ports = 主端口（如 27921）
-  - 名称最后加上跳跃端口信息
-无跳跃端口的节点：正常写入 port
+最终稳定版 - 按要求处理跳跃端口 + 加强 Hysteria1 参数提取
+Y系列 → sources.txt (前缀 Y-)
+Z系列 → sources-j.txt (前缀 Z-)
 """
 
 import yaml
@@ -44,11 +41,8 @@ def make_fingerprint(p):
     return hashlib.md5(key.lower().encode()).hexdigest()
 
 def parse_server_port(srv):
-    """返回 (server, main_port, ports_range)"""
     srv = str(srv).strip()
-    main_port = 443
     ports_range = None
-
     if ',' in srv:
         parts = [p.strip() for p in srv.split(',')]
         main_part = parts[0]
@@ -64,7 +58,7 @@ def parse_server_port(srv):
         parts = srv.rsplit(':', 1)
         if len(parts) == 2 and parts[1].isdigit():
             return parts[0], int(parts[1]), ports_range
-    return srv, main_port, ports_range
+    return srv, 443, ports_range
 
 def process_file(file_path, prefix):
     try:
@@ -117,14 +111,12 @@ def process_json(data, prefix):
                 if not s: continue
                 server, main_port, ports_range = parse_server_port(s)
                 
-                # ==================== 按你的要求处理跳跃端口 ====================
                 if ports_range:
-                    # 有跳跃端口：port = 跳跃范围，ports = 主端口
-                    final_port = ports_range
-                    final_ports = str(main_port)
+                    # 有跳跃端口：按你的要求
+                    final_port = ports_range          # port = 跳跃范围
+                    final_ports = str(main_port)      # ports = 主端口
                     name_suffix = f" ({ports_range})"
                 else:
-                    # 无跳跃端口：正常写入 port
                     final_port = main_port
                     final_ports = None
                     name_suffix = ""
@@ -133,7 +125,7 @@ def process_json(data, prefix):
                     "name": f"{prefix}{get_location(server)}-{typ.upper()}-{i+1}{name_suffix}",
                     "type": typ,
                     "server": server,
-                    "port": final_port,           # 按要求：有跳跃端口时写入跳跃范围
+                    "port": final_port,
                     "password": content.get('auth') or content.get('password', content.get('auth_str', '')),
                     "auth-str": content.get('auth_str') or content.get('auth') or content.get('password', ''),
                     "sni": content.get('sni') or content.get('peer') or content.get('server_name', ''),
@@ -141,19 +133,22 @@ def process_json(data, prefix):
                     "alpn": content.get('alpn', 'h3')
                 }
                 
-                if final_ports:
-                    p['ports'] = final_ports
-                
+                # Hysteria1 特有参数加强
                 if typ == "hysteria":
                     p["up"] = content.get('upmbps') or content.get('up') or 100
                     p["down"] = content.get('downmbps') or content.get('down') or 100
+                    if not p.get("sni") and content.get('peer'):
+                        p["sni"] = content.get('peer')
+                
+                if final_ports:
+                    p['ports'] = final_ports
                 
                 fp = make_fingerprint(p)
                 if fp not in servers_list:
                     extracted_proxies.append(p)
                     servers_list.append(fp)
 
-        # outbounds 处理（保留基本支持）
+        # outbounds 处理（保持最小改动）
         for ob in content.get('outbounds', []):
             if not isinstance(ob, dict): continue
             proto = (ob.get('protocol') or ob.get('type') or '').lower()
