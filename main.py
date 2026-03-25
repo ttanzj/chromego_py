@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 """
-ChromeGo Enhanced v2.7 - 最终定制版
-Y系列 (sources.txt)：完全保留原始提取逻辑，不测试
-Z系列 (sources-j.txt)：使用增强解析 + 真实连通性测试，只保留可用节点
+ChromeGo Enhanced v2.9 - 防死循环最终稳定版
+Y系列完全不动
+Z系列（sources-j.txt）全部处理 + 防卡死 + 可用性测试
 """
 
 import yaml
@@ -17,6 +17,10 @@ import base64
 import socket
 import time
 from urllib.parse import urlparse, parse_qs
+
+# ==================== 全局防卡死设置 ====================
+socket.setdefaulttimeout(15)                    # 全局 socket 超时 15 秒
+urllib.request.socket.setdefaulttimeout(15)     # urllib 超时
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -45,10 +49,9 @@ def make_fingerprint(p):
     return hashlib.md5(key.lower().encode()).hexdigest()
 
 def test_node_availability(proxy, timeout=8):
-    """TCP 连通性 + 延迟测试"""
     server = proxy.get('server')
     port = int(proxy.get('port', 443))
-    if not server or not isinstance(server, str):
+    if not server:
         return False, 9999
     try:
         start = time.time()
@@ -58,7 +61,6 @@ def test_node_availability(proxy, timeout=8):
     except:
         return False, 9999
 
-# ====================== 增强预处理 ======================
 def preprocess_subscription(data: str):
     content = data.strip()
     if not content:
@@ -74,7 +76,6 @@ def preprocess_subscription(data: str):
         return content
     return content
 
-# ====================== 增强节点解析器（VMess/VLESS/HY2/Trojan） ======================
 def parse_general_node(line: str, prefix: str, index: int):
     line = line.strip()
     if not line or line.startswith('#'):
@@ -114,9 +115,8 @@ def parse_general_node(line: str, prefix: str, index: int):
                 "skip-cert-verify": True,
                 "network": q.get("type", ["tcp"])[0],
                 "sni": q.get("sni", [""])[0] or q.get("host", [""])[0],
-                "flow": q.get("flow", [""])[0]
             }
-            if p["network"] == "ws":
+            if p.get("network") == "ws":
                 p["ws-opts"] = {"path": q.get("path", ["/"])[0], "headers": {"Host": p["sni"]}}
             return p if p.get("server") and p.get("uuid") else None
 
@@ -147,55 +147,55 @@ def parse_general_node(line: str, prefix: str, index: int):
                 "skip-cert-verify": True
             }
             return p if p.get("server") and p.get("password") else None
-
-        elif line.startswith('ss://'):
-            p = {"name": f"{prefix}GEN-SS-{index}", "type": "ss", "server": "example.com", "port": 443}
-            return p
     except:
         pass
     return None
 
-# ====================== Z系列增强处理（带测试） ======================
-def process_z_enhanced(url, prefix):
-    try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            raw = resp.read().decode('utf-8', errors='ignore')
-
-        processed = preprocess_subscription(raw)
-        lines = [line.strip() for line in processed.splitlines() if line.strip()]
-
-        added = 0
-        for i, line in enumerate(lines):
-            # 优先尝试新解析器
-            node = parse_general_node(line, prefix, i + 1)
-            if not node or not node.get('server'):
-                continue
-
-            fp = make_fingerprint(node)
-            if fp in servers_list:
-                continue
-
-            # 真实可用性测试
-            is_alive, delay = test_node_availability(node)
-            if not is_alive or delay > 800:   # 可根据需要调整阈值
-                continue
-
-            node['name'] = f"{node['name']}-{delay}ms"
+# ====================== Z系列单链接处理（带重试 + 防卡死） ======================
+def process_z_url(url, prefix="Z-"):
+    for attempt in range(3):  # 最多重试 3 次
+        try:
+            logging.info(f"[{attempt+1}/3] 正在处理 Z系列: {url}")
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             
-            # SS 节点限量
-            if node.get('type') == 'ss' and len([n for n in extracted_proxies if n.get('type') == 'ss']) > 30:
-                continue
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                raw_data = resp.read().decode('utf-8', errors='ignore')
 
-            extracted_proxies.append(node)
-            servers_list.append(fp)
-            added += 1
+            processed_data = preprocess_subscription(raw_data)
+            added = 0
 
-        logging.info(f"✓ Z系列增强处理完成: {url} → 新增 {added} 个可用节点")
-    except Exception as e:
-        logging.error(f"✗ Z系列增强处理失败 {url}: {e}")
+            # 增强解析（vmess/vless/hy2/trojan）
+            lines = [line.strip() for line in processed_data.splitlines() if line.strip()]
+            for i, line in enumerate(lines):
+                node = parse_general_node(line, prefix, i + 1)
+                if node and node.get('server'):
+                    fp = make_fingerprint(node)
+                    if fp in servers_list:
+                        continue
+                    is_alive, delay = test_node_availability(node, timeout=6)
+                    if is_alive and delay <= 1000:
+                        node['name'] = f"{node['name']}-{delay}ms"
+                        extracted_proxies.append(node)
+                        servers_list.append(fp)
+                        added += 1
 
-# ====================== 原有函数完全保留 ======================
+            # 原始逻辑补充
+            if url.endswith(('.yaml', '.yml')) or 'proxies:' in processed_data or 'proxy:' in processed_data:
+                process_clash(processed_data, prefix)
+            else:
+                process_json(processed_data, prefix)
+
+            logging.info(f"✓ Z系列处理完成: {url} → 新增可用节点 {added} 个")
+            return  # 成功则退出重试
+
+        except Exception as e:
+            logging.warning(f"[{attempt+1}/3] 处理失败 {url}: {type(e).__name__} - {e}")
+            if attempt < 2:
+                time.sleep(3)  # 失败后等待 3 秒再重试
+            else:
+                logging.error(f"✗ Z系列最终失败 {url}")
+
+# ====================== 原有函数（完全保留） ======================
 def process_file(file_path, prefix):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -204,7 +204,7 @@ def process_file(file_path, prefix):
         for url in urls:
             try:
                 req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-                with urllib.request.urlopen(req, timeout=25) as resp:
+                with urllib.request.urlopen(req, timeout=20) as resp:
                     raw_data = resp.read().decode('utf-8', errors='ignore')
 
                 processed_data = preprocess_subscription(raw_data)
@@ -216,7 +216,7 @@ def process_file(file_path, prefix):
 
                 logging.info(f"✓ {prefix}系列 ChromeGo 原逻辑处理完成: {url}")
             except Exception as e:
-                logging.error(f"✗ {prefix}系列 处理失败 {url}: {e}")
+                logging.error(f"✗ {prefix}系列 处理失败 {url}: {type(e).__name__}")
     except Exception as e:
         logging.error(f"读取 {file_path} 失败: {e}")
 
@@ -239,7 +239,6 @@ def process_clash(data, prefix):
 def process_json(data, prefix):
     try:
         content = json.loads(data)
-        
         if 'server' in content or 'servers' in content:
             servers = content.get('server') or content.get('servers', [])
             if isinstance(servers, str): servers = [servers]
@@ -284,7 +283,6 @@ def process_json(data, prefix):
                     extracted_proxies.append(p)
                     servers_list.append(fp)
 
-        # outbounds 处理
         for ob in content.get('outbounds', []):
             if not isinstance(ob, dict): continue
             proto = (ob.get('protocol') or ob.get('type') or '').lower()
@@ -327,29 +325,27 @@ def parse_server_port(srv):
 # ====================== 主程序 ======================
 if __name__ == "__main__":
     os.makedirs("outputs", exist_ok=True)
-    logging.info("=== ChromeGo Enhanced v2.7 启动 ===")
-    logging.info("Y系列 (sources.txt)：使用原始逻辑，不测试")
-    logging.info("Z系列 (sources-j.txt)：使用增强解析 + 可用性测试，只保留可用节点")
+    logging.info("=== ChromeGo Enhanced v2.9 防死循环版启动 ===")
 
-    # Y系列：完全使用原始逻辑
+    # Y系列（完全不动）
     process_file("urls/sources.txt", "Y-")
 
-    # Z系列：使用增强逻辑 + 测试
+    # Z系列（全部走防卡死处理）
     try:
         with open("urls/sources-j.txt", 'r', encoding='utf-8') as f:
             z_urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
         
-        for url in z_urls:
-            # 先尝试用增强解析 + 测试
-            process_z_enhanced(url, "Z-")
-            # 如果需要，也可以保留原有 process_json/process_clash 作为补充
-            # 但按你要求，Z系列统一走新逻辑
+        logging.info(f"共发现 {len(z_urls)} 个 Z系列订阅源，开始逐个处理...")
+        
+        for idx, url in enumerate(z_urls, 1):
+            logging.info(f"--- 处理第 {idx}/{len(z_urls)} 个 Z系列源 ---")
+            process_z_url(url, "Z-")
+            
     except Exception as e:
         logging.error(f"读取 sources-j.txt 失败: {e}")
 
-    logging.info(f"最终保留 {len(extracted_proxies)} 个节点（Z系列已过滤不可用节点）")
-
+    logging.info(f"最终共保留 {len(extracted_proxies)} 个节点")
     with open("outputs/clash_meta.yaml", "w", encoding="utf-8") as f:
         yaml.dump({"proxies": extracted_proxies}, f, allow_unicode=True, sort_keys=False)
 
-    logging.info("✅ clash_meta.yaml 已成功生成！")
+    logging.info("✅ clash_meta.yaml 已生成完成！")
