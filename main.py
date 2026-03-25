@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
 最终修正版 - 自动判断 hysteria / hysteria2 + 正确处理跳跃端口
+增强版：增加对 Base64 / Clash YAML 的更好解析容错（不改变原有提取逻辑）
 """
 
 import yaml
@@ -11,6 +12,7 @@ import geoip2.database
 import os
 import hashlib
 import re
+import base64
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -58,6 +60,34 @@ def parse_server_port(srv):
             return parts[0], int(parts[1]), ports_range
     return srv, 443, ports_range
 
+# ====================== 新增：增强预处理函数 ======================
+def preprocess_subscription(data: str):
+    """对原始订阅内容进行 Base64 / YAML / 纯文本 容错预处理"""
+    content = data.strip()
+    if not content:
+        return content
+
+    # 1. 尝试 Base64 解码（常见于 barry-far、v2ray.txt 等）
+    try:
+        # 自动补全 padding
+        padding = '=' * (-len(content) % 4)
+        decoded_bytes = base64.b64decode(content + padding, validate=False)
+        decoded = decoded_bytes.decode('utf-8', errors='ignore')
+        if any(decoded.startswith(prefix) for prefix in ('vmess://', 'vless://', 'trojan://', 'ss://', 'hysteria2://')) or '://' in decoded[:100]:
+            logging.info("✓ Base64 解码成功")
+            return decoded  # 返回解码后的纯文本节点列表
+    except Exception:
+        pass
+
+    # 2. 如果是纯文本多行节点链接（每行一个 vmess:// 等），直接返回
+    if any(line.strip().startswith(('vmess://', 'vless://', 'trojan://', 'ss://')) for line in content.splitlines()[:5]):
+        logging.info("✓ 检测到纯文本节点链接")
+        return content
+
+    # 3. 其他情况返回原始内容（让原有 process_clash / process_json 处理）
+    return content
+
+
 def process_file(file_path, prefix):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -67,12 +97,16 @@ def process_file(file_path, prefix):
             try:
                 req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
                 with urllib.request.urlopen(req, timeout=25) as resp:
-                    data = resp.read().decode('utf-8', errors='ignore')
+                    raw_data = resp.read().decode('utf-8', errors='ignore')
 
-                if url.endswith(('.yaml', '.yml')):
-                    process_clash(data, prefix)
+                # === 关键增强：预处理 ===
+                processed_data = preprocess_subscription(raw_data)
+
+                # 根据 URL 后缀或内容特征决定处理方式（保持原有逻辑不变）
+                if url.endswith(('.yaml', '.yml')) or 'proxies:' in processed_data or 'proxy:' in processed_data:
+                    process_clash(processed_data, prefix)
                 else:
-                    process_json(data, prefix)
+                    process_json(processed_data, prefix)
 
                 logging.info(f"✓ {prefix}系列 处理完成: {url}")
             except Exception as e:
@@ -80,6 +114,8 @@ def process_file(file_path, prefix):
     except Exception as e:
         logging.error(f"读取 {file_path} 失败: {e}")
 
+
+# ====================== 原有函数完全不动 ======================
 def process_clash(data, prefix):
     try:
         content = yaml.safe_load(data)
@@ -96,6 +132,7 @@ def process_clash(data, prefix):
     except Exception as e:
         logging.error(f"Clash 处理异常: {e}")
 
+
 def process_json(data, prefix):
     try:
         content = json.loads(data)
@@ -104,7 +141,6 @@ def process_json(data, prefix):
             servers = content.get('server') or content.get('servers', [])
             if isinstance(servers, str): servers = [servers]
             
-            # 自动判断：只要出现跳跃端口，就判定为 hysteria2
             has_hop = any(',' in str(s) and '-' in str(s) for s in servers)
             typ = "hysteria2" if has_hop or "hysteria2" in str(content).lower() else "hysteria"
             
@@ -113,7 +149,6 @@ def process_json(data, prefix):
                 server, main_port, ports_range = parse_server_port(s)
                 
                 if ports_range:
-                    # 有跳跃端口：port = 主端口, ports = 跳跃范围（推荐方式）
                     final_port = main_port
                     final_ports = ports_range
                     name_suffix = f" ({ports_range})"
@@ -165,6 +200,7 @@ def process_json(data, prefix):
                 servers_list.append(fp)
     except Exception as e:
         logging.error(f"JSON 处理异常: {e}")
+
 
 if __name__ == "__main__":
     os.makedirs("outputs", exist_ok=True)
