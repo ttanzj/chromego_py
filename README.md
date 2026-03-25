@@ -30,31 +30,6 @@ A python script to extract ChromeGo Proxies
   
   [https://raw.githubusercontent.com/用户名/chromego_py/main/outputs/clash_meta.yaml](https://raw.githubusercontent.com/用户名/chromego_py/main/outputs/clash_meta.yaml)
 
-- Base64:
-
-  [https://raw.githubusercontent.com/用户名/chromego_py/main/outputs/base64.txt](https://raw.githubusercontent.com/用户名/chromego_py/main/outputs/base64.txt)
-
-<details>
-
-<summary>(备用)</summary>
-
-- Clash Meta (不带WARP):
-  
-  [https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/clash_meta.yaml](https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/clash_meta.yaml)
-
-- Clash Meta (带WARP):
-  
-  [https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/clash_meta_warp.yaml](https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/clash_meta_warp.yaml)
-  
-- Base64:
-
-  [https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/base64.txt](https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/base64.txt)
-
-- Proxy urls:
-
-  [https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/proxy_urls.txt](https://gcore.jsdelivr.net/gh/linzjian666/chromego_extractor@main/outputs/proxy_urls.txt)
-
-</details>
 
 ### 本地运行：
 <details>
@@ -81,7 +56,7 @@ python main.py
 ```
 
 #### 4. 获取代理信息
-脚本将提取 ChromeGo 代理节点信息，并保存到`outputs`目录中。
+脚本将提取 ChromeGo 代理节点信息，并保存到`outputs`目录中，其中sources.txt是Chromego提取出的订阅，sources-j.txt是增加的互联网其他订阅，订阅格式都直接写地址，一行一个，不加其他内容。
 
 #### 5. 其他
 根据需要，你可以自行修改脚本的一些配置，比如保存文件的路径等。
