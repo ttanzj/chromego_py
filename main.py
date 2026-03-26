@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """
-ChromeGo Enhanced v3.0 - Y/Z 合并最终稳定版
+ChromeGo Enhanced v3.1 - Z系列强力解析版（已针对你反馈的“第一个源只提取1个”问题优化）
 Y系列：完全保留原始提取和输出逻辑（不变）
-Z系列：订阅源地址提取方式完全不变，但提取逻辑采用强化版
-输出三个文件：合并 + Y单独 + Z单独
-增强防卡死 + 强制跳过问题源
+Z系列：订阅源地址提取方式完全不变，但预处理 + 解析逻辑全面强化
+    • 多层 Base64 递归解码（最多5层）
+    • 自动拆分单行长订阅
+    • 更宽松可用性测试（1500ms）
+    • 详细调试日志（方便你看到到底卡在哪里）
+输出三个文件：
+    • outputs/clash_meta.yaml   ← Y + Z 合并（推荐直接用）
+    • outputs/y_clash.yaml      ← 仅Y系列
+    • outputs/z_clash.yaml      ← 仅Z系列
 """
 
 import yaml
@@ -55,13 +61,12 @@ def get_location(ip: str) -> str:
         return "UNK"
 
 def make_fingerprint(p: dict) -> str:
-    """优化后的去重指纹"""
     key = "|".join(str(p.get(k, '')).lower().strip() for k in [
         'server', 'port', 'type', 'uuid', 'password', 'auth-str', 'network', 'sni'
     ])
     return hashlib.md5(key.encode()).hexdigest()
 
-def test_node_availability(proxy: dict, timeout: int = 6) -> tuple[bool, int]:
+def test_node_availability(proxy: dict, timeout: int = 8) -> tuple[bool, int]:
     server = proxy.get('server')
     port = int(proxy.get('port', 443))
     if not server:
@@ -74,28 +79,46 @@ def test_node_availability(proxy: dict, timeout: int = 6) -> tuple[bool, int]:
     except Exception:
         return False, 9999
 
+# ====================== 【核心修复】超级强化预处理（解决你第一个Z源只提取1个的问题） ======================
 def preprocess_subscription(data: str) -> str:
-    """强化版 Base64 递归解码（来自 Pr0xySh4rk 优化）"""
     content = data.strip()
     if not content:
         return content
 
-    for _ in range(3):
-        if "://" not in content[:200] and "\n" not in content and len(content) > 30:
+    attempts = 0
+    max_attempts = 5
+    logger.info(f"原始内容长度: {len(content)} 字符")
+
+    while attempts < max_attempts:
+        attempts += 1
+        # 单行长 Base64（很多订阅站返回的就是这种）
+        if "\n" not in content and len(content) > 100 and "://" not in content[:150]:
             try:
                 padding = '=' * (-len(content) % 4)
                 decoded = base64.b64decode(content + padding, validate=False).decode('utf-8', errors='ignore')
-                if any(p in decoded[:300] for p in ['vmess://', 'vless://', 'trojan://', 'ss://', 'hysteria2://', 'hy2://']):
+                if len(decoded) > len(content) * 0.7 and any(p in decoded[:400] for p in 
+                    ['vmess://', 'vless://', 'trojan://', 'ss://', 'hysteria2://', 'hy2://', 'proxies:', 'outbounds:']):
                     content = decoded.strip()
+                    logger.info(f"✅ Base64 解码成功（第 {attempts} 层）")
                     continue
             except Exception:
                 break
         else:
             break
+
+    # 如果还是单行但包含协议，强制拆行（防止一行塞几百个节点）
+    if "\n" not in content and any(p in content for p in ['://', 'proxies:', '{']):
+        content = content.replace('vmess://', '\nvmess://') \
+                         .replace('vless://', '\nvless://') \
+                         .replace('trojan://', '\ntrojan://') \
+                         .replace('hysteria2://', '\nhysteria2://') \
+                         .replace('hy2://', '\nhy2://')
+        logger.info("✅ 已强制拆分成多行")
+
+    logger.info(f"预处理完成 → 最终 {len(content)} 字符，前300字符预览: {content[:300].replace(chr(10), '\\n')[:300]}")
     return content
 
 def parse_general_node(line: str, prefix: str, index: int) -> dict | None:
-    """优化后的通用节点解析"""
     line = line.strip()
     if not line or line.startswith('#'):
         return None
@@ -173,11 +196,11 @@ def parse_general_node(line: str, prefix: str, index: int) -> dict | None:
         pass
     return None
 
+# ====================== Z系列处理（已加入大量调试日志） ======================
 def process_z_url(url: str, prefix: str = "Z-"):
-    """Z系列防死循环处理"""
     for attempt in range(3):
         try:
-            logger.info(f"[{attempt+1}/3] 处理 Z系列: {url}")
+            logger.info(f"[{attempt+1}/3] 开始处理 Z系列源: {url}")
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
 
             with urllib.request.urlopen(req, timeout=15) as resp:
@@ -186,29 +209,41 @@ def process_z_url(url: str, prefix: str = "Z-"):
             processed_data = preprocess_subscription(raw_data)
             added = 0
 
-            lines = [line.strip() for line in processed_data.splitlines() if line.strip()]
+            lines = [line.strip() for line in processed_data.splitlines() if line.strip() and not line.startswith('#')]
+            logger.info(f"该源解析出 {len(lines)} 行有效内容，开始逐行处理...")
+
             for i, line in enumerate(lines):
                 node = parse_general_node(line, prefix, i + 1)
-                if not node or not node.get('server'):
-                    continue
-                fp = make_fingerprint(node)
-                if fp in servers_list:
-                    continue
+                if node and node.get('server'):
+                    fp = make_fingerprint(node)
+                    if fp in servers_list:
+                        continue
 
-                is_alive, delay = test_node_availability(node, timeout=6)
-                if is_alive and delay <= 1000:
-                    node['name'] = f"{node['name']}-{delay}ms"
-                    extracted_z.append(node)
-                    servers_list.append(fp)
-                    added += 1
+                    is_alive, delay = test_node_availability(node, timeout=8)
+                    if is_alive and delay <= 1500:          # 放宽到1500ms（NekoBox能用的大部分都能过）
+                        node['name'] = f"{node['name']}-{delay}ms"
+                        extracted_z.append(node)
+                        servers_list.append(fp)
+                        added += 1
+                        if added <= 8:                      # 只打印前8个便于观察
+                            logger.info(f"  ✓ 添加节点 #{added}: {node['name']} | {node.get('type')} | {node.get('server')}")
+                    else:
+                        # 可选：如果你想强制保留所有解析出的节点（像NekoBox一样），把下面两行取消注释
+                        # node['name'] = f"{node.get('name', prefix+'NODE')}-raw"
+                        # extracted_z.append(node)
+                        # servers_list.append(fp)
+                        # added += 1
+                        pass
+                elif i < 15 or any(x in line for x in ['://']):   # 打印前15行和包含协议的失败行用于调试
+                    logger.debug(f"  未解析行 {i+1}: {line[:150]}...")
 
-            # 兼容 YAML/JSON 订阅
+            # 兼容 YAML/JSON 订阅（原逻辑保留）
             if url.endswith(('.yaml', '.yml')) or 'proxies:' in processed_data or 'proxy:' in processed_data:
                 process_clash(processed_data, prefix, extracted_z)
             else:
                 process_json(processed_data, prefix, extracted_z)
 
-            logger.info(f"✓ Z系列处理完成: {url} → 新增 {added} 个可用节点")
+            logger.info(f"✓ Z系列处理完成: {url} → 新增可用节点 {added} 个")
             return
 
         except Exception as e:
@@ -218,8 +253,8 @@ def process_z_url(url: str, prefix: str = "Z-"):
             else:
                 logger.error(f"✗ Z系列最终放弃（强制跳过）: {url}")
 
+# ====================== Y系列处理（完全保留原始逻辑） ======================
 def process_file(file_path: str, prefix: str, target_list: list):
-    """Y系列处理（完全保留原始逻辑）"""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
@@ -252,8 +287,7 @@ def process_clash(data: str, prefix: str, target_list: list):
                 continue
             p = dict(p)
             fp = make_fingerprint(p)
-            if fp in servers_list:
-                continue
+            if fp in servers_list: continue
             p['name'] = f"{prefix}{get_location(p.get('server'))}-{p.get('type','unk').upper()}-{i+1}"
             target_list.append(p)
             servers_list.append(fp)
@@ -265,8 +299,7 @@ def process_json(data: str, prefix: str, target_list: list):
         content = json.loads(data)
         if 'server' in content or 'servers' in content:
             servers = content.get('server') or content.get('servers', [])
-            if isinstance(servers, str):
-                servers = [servers]
+            if isinstance(servers, str): servers = [servers]
 
             has_hop = any(',' in str(s) and '-' in str(s) for s in servers)
             typ = "hysteria2" if has_hop or "hysteria2" in str(content).lower() else "hysteria"
@@ -274,7 +307,6 @@ def process_json(data: str, prefix: str, target_list: list):
             for i, s in enumerate(servers):
                 if not s: continue
                 server, main_port, ports_range = parse_server_port(s)
-
                 name_suffix = f" ({ports_range})" if ports_range else ""
                 p = {
                     "name": f"{prefix}{get_location(server)}-{typ.upper()}-{i+1}{name_suffix}",
@@ -287,8 +319,7 @@ def process_json(data: str, prefix: str, target_list: list):
                     "skip-cert-verify": content.get('insecure', True),
                     "alpn": content.get('alpn', 'h3')
                 }
-                if ports_range:
-                    p['ports'] = ports_range
+                if ports_range: p['ports'] = ports_range
                 if typ == "hysteria":
                     p["up"] = content.get('upmbps') or content.get('up') or 100
                     p["down"] = content.get('downmbps') or content.get('down') or 100
@@ -326,11 +357,9 @@ def parse_server_port(srv: str):
         if len(parts) > 1 and '-' in parts[-1]:
             ports_range = parts[-1]
         srv = main_part
-
     if srv.startswith('['):
         m = re.match(r'\[([^\]]+)\]:(\d+)', srv)
-        if m:
-            return m.group(1), int(m.group(2)), ports_range
+        if m: return m.group(1), int(m.group(2)), ports_range
     if ':' in srv:
         parts = srv.rsplit(':', 1)
         if len(parts) == 2 and parts[1].isdigit():
@@ -340,9 +369,9 @@ def parse_server_port(srv: str):
 # ====================== 主程序 ======================
 if __name__ == "__main__":
     os.makedirs("outputs", exist_ok=True)
-    logger.info("=== ChromeGo Enhanced v3.0 Y/Z合并版启动 ===")
+    logger.info("=== ChromeGo Enhanced v3.1 Z系列强力解析版启动 ===")
 
-    # Y系列（完全保留原始逻辑）
+    # Y系列
     logger.info("开始处理 Y系列（sources.txt）...")
     process_file("urls/sources.txt", "Y-", extracted_y)
 
@@ -352,19 +381,18 @@ if __name__ == "__main__":
         if os.path.exists(z_path):
             with open(z_path, 'r', encoding='utf-8') as f:
                 z_urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
-
-            logger.info(f"共发现 {len(z_urls)} 个 Z系列订阅源，开始处理...")
+            logger.info(f"共发现 {len(z_urls)} 个 Z系列订阅源，开始逐个强力处理...")
             for idx, url in enumerate(z_urls, 1):
                 logger.info(f"--- 处理第 {idx}/{len(z_urls)} 个 Z系列源 ---")
                 process_z_url(url, "Z-")
         else:
-            logger.warning(f"{z_path} 文件不存在，跳过 Z系列处理")
+            logger.warning(f"{z_path} 文件不存在，跳过 Z系列")
     except Exception as e:
         logger.error(f"读取 sources-j.txt 失败: {e}")
 
-    # 输出文件
+    # 输出
     combined = extracted_y + extracted_z
-    logger.info(f"最终节点统计 → 总计: {len(combined)} | Y系列: {len(extracted_y)} | Z系列: {len(extracted_z)}")
+    logger.info(f"最终节点统计 → 总计: {len(combined)} | Y: {len(extracted_y)} | Z: {len(extracted_z)}")
 
     with open("outputs/clash_meta.yaml", "w", encoding="utf-8") as f:
         yaml.dump({"proxies": combined}, f, allow_unicode=True, sort_keys=False)
@@ -378,4 +406,4 @@ if __name__ == "__main__":
     logger.info("✅ 输出完成！")
     logger.info("   • outputs/clash_meta.yaml  ← Y+Z 合并（推荐使用）")
     logger.info("   • outputs/y_clash.yaml      ← 仅Y系列")
-    logger.info("   • outputs/z_clash.yaml      ← 仅Z系列")
+    logger.info("   • outputs/z_clash.yaml      ← 仅Z系列（已针对第一个源优化）")
