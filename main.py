@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """
-ChromeGo Enhanced v3.1 - Z系列强力解析版（已针对你反馈的“第一个源只提取1个”问题优化）
-Y系列：完全保留原始提取和输出逻辑（不变）
-Z系列：订阅源地址提取方式完全不变，但预处理 + 解析逻辑全面强化
-    • 多层 Base64 递归解码（最多5层）
-    • 自动拆分单行长订阅
-    • 更宽松可用性测试（1500ms）
-    • 详细调试日志（方便你看到到底卡在哪里）
-输出三个文件：
-    • outputs/clash_meta.yaml   ← Y + Z 合并（推荐直接用）
-    • outputs/y_clash.yaml      ← 仅Y系列
-    • outputs/z_clash.yaml      ← 仅Z系列
+ChromeGo Enhanced v3.1 - Z系列强力解析版（已修复 f-string 语法错误）
+Y系列：完全保留原始提取和输出逻辑
+Z系列：订阅源地址提取方式不变，预处理 + 解析全面强化
 """
 
 import yaml
@@ -39,9 +31,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ChromeGo")
 
-servers_list: list[str] = []          # 全局去重指纹
-extracted_y: list[dict] = []          # Y系列
-extracted_z: list[dict] = []          # Z系列
+servers_list: list[str] = []
+extracted_y: list[dict] = []
+extracted_z: list[dict] = []
 geo_reader = None
 
 try:
@@ -79,7 +71,7 @@ def test_node_availability(proxy: dict, timeout: int = 8) -> tuple[bool, int]:
     except Exception:
         return False, 9999
 
-# ====================== 【核心修复】超级强化预处理（解决你第一个Z源只提取1个的问题） ======================
+# ====================== 强化预处理（已修复 f-string） ======================
 def preprocess_subscription(data: str) -> str:
     content = data.strip()
     if not content:
@@ -91,7 +83,6 @@ def preprocess_subscription(data: str) -> str:
 
     while attempts < max_attempts:
         attempts += 1
-        # 单行长 Base64（很多订阅站返回的就是这种）
         if "\n" not in content and len(content) > 100 and "://" not in content[:150]:
             try:
                 padding = '=' * (-len(content) % 4)
@@ -106,7 +97,7 @@ def preprocess_subscription(data: str) -> str:
         else:
             break
 
-    # 如果还是单行但包含协议，强制拆行（防止一行塞几百个节点）
+    # 强制拆行
     if "\n" not in content and any(p in content for p in ['://', 'proxies:', '{']):
         content = content.replace('vmess://', '\nvmess://') \
                          .replace('vless://', '\nvless://') \
@@ -115,7 +106,9 @@ def preprocess_subscription(data: str) -> str:
                          .replace('hy2://', '\nhy2://')
         logger.info("✅ 已强制拆分成多行")
 
-    logger.info(f"预处理完成 → 最终 {len(content)} 字符，前300字符预览: {content[:300].replace(chr(10), '\\n')[:300]}")
+    # 修复后的预览输出（避免 f-string 中出现反斜杠）
+    preview = content[:300].replace('\n', '\\n')
+    logger.info(f"预处理完成 → 最终 {len(content)} 字符，前300字符预览: {preview}")
     return content
 
 def parse_general_node(line: str, prefix: str, index: int) -> dict | None:
@@ -196,7 +189,6 @@ def parse_general_node(line: str, prefix: str, index: int) -> dict | None:
         pass
     return None
 
-# ====================== Z系列处理（已加入大量调试日志） ======================
 def process_z_url(url: str, prefix: str = "Z-"):
     for attempt in range(3):
         try:
@@ -220,24 +212,16 @@ def process_z_url(url: str, prefix: str = "Z-"):
                         continue
 
                     is_alive, delay = test_node_availability(node, timeout=8)
-                    if is_alive and delay <= 1500:          # 放宽到1500ms（NekoBox能用的大部分都能过）
+                    if is_alive and delay <= 1500:
                         node['name'] = f"{node['name']}-{delay}ms"
                         extracted_z.append(node)
                         servers_list.append(fp)
                         added += 1
-                        if added <= 8:                      # 只打印前8个便于观察
+                        if added <= 8:
                             logger.info(f"  ✓ 添加节点 #{added}: {node['name']} | {node.get('type')} | {node.get('server')}")
-                    else:
-                        # 可选：如果你想强制保留所有解析出的节点（像NekoBox一样），把下面两行取消注释
-                        # node['name'] = f"{node.get('name', prefix+'NODE')}-raw"
-                        # extracted_z.append(node)
-                        # servers_list.append(fp)
-                        # added += 1
-                        pass
-                elif i < 15 or any(x in line for x in ['://']):   # 打印前15行和包含协议的失败行用于调试
+                elif i < 15 or '://' in line:
                     logger.debug(f"  未解析行 {i+1}: {line[:150]}...")
 
-            # 兼容 YAML/JSON 订阅（原逻辑保留）
             if url.endswith(('.yaml', '.yml')) or 'proxies:' in processed_data or 'proxy:' in processed_data:
                 process_clash(processed_data, prefix, extracted_z)
             else:
@@ -253,7 +237,6 @@ def process_z_url(url: str, prefix: str = "Z-"):
             else:
                 logger.error(f"✗ Z系列最终放弃（强制跳过）: {url}")
 
-# ====================== Y系列处理（完全保留原始逻辑） ======================
 def process_file(file_path: str, prefix: str, target_list: list):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -371,11 +354,9 @@ if __name__ == "__main__":
     os.makedirs("outputs", exist_ok=True)
     logger.info("=== ChromeGo Enhanced v3.1 Z系列强力解析版启动 ===")
 
-    # Y系列
     logger.info("开始处理 Y系列（sources.txt）...")
     process_file("urls/sources.txt", "Y-", extracted_y)
 
-    # Z系列
     try:
         z_path = "urls/sources-j.txt"
         if os.path.exists(z_path):
@@ -390,7 +371,6 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"读取 sources-j.txt 失败: {e}")
 
-    # 输出
     combined = extracted_y + extracted_z
     logger.info(f"最终节点统计 → 总计: {len(combined)} | Y: {len(extracted_y)} | Z: {len(extracted_z)}")
 
@@ -406,4 +386,4 @@ if __name__ == "__main__":
     logger.info("✅ 输出完成！")
     logger.info("   • outputs/clash_meta.yaml  ← Y+Z 合并（推荐使用）")
     logger.info("   • outputs/y_clash.yaml      ← 仅Y系列")
-    logger.info("   • outputs/z_clash.yaml      ← 仅Z系列（已针对第一个源优化）")
+    logger.info("   • outputs/z_clash.yaml      ← 仅Z系列")
