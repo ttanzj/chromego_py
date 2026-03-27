@@ -3,43 +3,14 @@ proxies:
   type: hysteria
   server: 2001:bc8:32d7:17b::2
   port: 11000
-  password: dongtaiwang.com
   auth-str: dongtaiwang.com
   sni: apple.com
   skip-cert-verify: true
-  alpn: h3
-  up: 100
-  down: 100
-- name: FR-HYSTERIA-1
-  type: hysteria
-  server: 2001:bc8:32d7:17b::8
-  port: 22000
-  password: dongtaiwang.com
-  auth-str: dongtaiwang.com
-  sni: ''
-  skip-cert-verify: true
-  alpn: h3
-  up: 100
-  down: 100
-- name: FR-HYSTERIA-1
-  type: hysteria
-  server: 2001:bc8:32d7:302::11
-  port: 20088
-  password: dongtaiwang.com
-  auth-str: dongtaiwang.com
-  sni: ''
-  skip-cert-verify: true
-  alpn: h3
-  up: 100
-  down: 100
-- server: 5.83.129.90
-  port: 443
-  type: hysteria
-  name: DE-HYSTERIA-4
-- server: 45.150.65.154
-  port: 443
-  type: hysteria
-  name: US-Secaucus-HYSTERIA-5
+  alpn:
+  - h3
+  protocol: udp
+  up: 11 Mbps
+  down: 55 Mbps
 - name: FR-TUIC-1
   server: 2001:bc8:32d7:302::16
   port: 34997
@@ -58,30 +29,6 @@ proxies:
   server: 2001:bc8:32d7:302::17
   port: 20088
   password: dongtaiwang.com
-  sni: apple.com
-  skip-cert-verify: true
-  alpn:
-  - h3
-  protocol: udp
-  up: 11 Mbps
-  down: 55 Mbps
-- name: DE-HYSTERIA-1
-  type: hysteria
-  server: 5.83.129.143
-  port: 26691
-  auth-str: dongtaiwang.com
-  sni: apple.com
-  skip-cert-verify: true
-  alpn:
-  - h3
-  protocol: udp
-  up: 11 Mbps
-  down: 55 Mbps
-- name: UNK-HYSTERIA-1
-  type: hysteria
-  server: 2a14:7584:d099::a
-  port: 26691
-  auth-str: dongtaiwang.com
   sni: apple.com
   skip-cert-verify: true
   alpn:
@@ -153,6 +100,30 @@ proxies:
   protocol: udp
   up: 11 Mbps
   down: 55 Mbps
+- name: UNK-HYSTERIA-1
+  type: hysteria
+  server: 2a14:7584:d099::a
+  port: 26691
+  auth-str: dongtaiwang.com
+  sni: apple.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+  protocol: udp
+  up: 11 Mbps
+  down: 55 Mbps
+- name: DE-HYSTERIA-1
+  type: hysteria
+  server: 5.83.129.143
+  port: 26691
+  auth-str: dongtaiwang.com
+  sni: apple.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+  protocol: udp
+  up: 11 Mbps
+  down: 55 Mbps
 - name: DE-HYSTERIA-1
   type: hysteria
   server: 5.83.129.153
@@ -171,6 +142,28 @@ proxies:
   password: dongtaiwang.com
   auth-str: dongtaiwang.com
   sni: apple.com
+  skip-cert-verify: true
+  alpn: h3
+  up: 100
+  down: 100
+- name: FR-HYSTERIA-1
+  type: hysteria
+  server: 2001:bc8:32d7:17b::8
+  port: 22000
+  password: dongtaiwang.com
+  auth-str: dongtaiwang.com
+  sni: ''
+  skip-cert-verify: true
+  alpn: h3
+  up: 100
+  down: 100
+- name: FR-HYSTERIA-1
+  type: hysteria
+  server: 2001:bc8:32d7:302::11
+  port: 20088
+  password: dongtaiwang.com
+  auth-str: dongtaiwang.com
+  sni: ''
   skip-cert-verify: true
   alpn: h3
   up: 100
@@ -207,6 +200,18 @@ proxies:
   alpn: h3
   up: 100
   down: 100
+- server: 5.83.129.90
+  port: 443
+  type: hysteria
+  name: DE-HYSTERIA-18
+- server: 45.150.65.154
+  port: 443
+  type: hysteria
+  name: US-Secaucus-HYSTERIA-19
+- server: 111.243.110.158
+  port: 39263
+  type: hysteria
+  name: TW-Hsinchu-HYSTERIA-20
 - name: UNK-HYSTERIA-1
   type: hysteria
   server: fan.193919.xyz
@@ -229,7 +234,3 @@ proxies:
   alpn: h3
   up: 100
   down: 100
-- server: 111.243.110.158
-  port: 39263
-  type: hysteria
-  name: TW-Hsinchu-HYSTERIA-22
