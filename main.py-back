@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 """
-ChromeGo Enhanced v3.4 - 纯 Y 系列版（仅去除 Y- 前缀，其他逻辑完全不变）
+ChromeGo Enhanced v3.5 - 纯 Y 系列版
+- 其他提取逻辑完全不变
+- 仅增强去重逻辑：增加 sni 识别（避免 sni 不同但其他字段相同的节点被去重）
+- 节点名称去除 "Y-" 前缀
 """
 
 import yaml
@@ -49,9 +52,12 @@ def get_location(ip: str) -> str:
     except:
         return "UNK"
 
+# ====================== 【核心修改】增强版指纹去重 - 增加 sni 识别 ======================
 def make_fingerprint(p: dict) -> str:
-    """保留原版指纹逻辑"""
-    key = f"{p.get('server','')}|{p.get('port','')}|{p.get('type','')}|{p.get('uuid') or p.get('password') or p.get('auth-str','')}|{p.get('network','')}|{p.get('sni','')}"
+    """原逻辑基础上增加 sni 识别，避免 sni 不同但其他字段一致的节点被去重"""
+    key = f"{p.get('server','')}|{p.get('port','')}|{p.get('type','')}|" \
+          f"{p.get('uuid') or p.get('password') or p.get('auth-str','')}|" \
+          f"{p.get('network','')}|{p.get('sni','')}|{p.get('servername','')}"
     return hashlib.md5(key.lower().encode()).hexdigest()
 
 def test_node_availability(proxy: dict, timeout: int = 8) -> tuple[bool, int]:
@@ -68,7 +74,7 @@ def test_node_availability(proxy: dict, timeout: int = 8) -> tuple[bool, int]:
         return False, 9999
 
 def preprocess_subscription(data: str) -> str:
-    """保留原版预处理逻辑"""
+    """原版预处理逻辑，完全不变"""
     content = data.strip()
     if not content:
         return content
@@ -120,7 +126,7 @@ def process_clash(data: str):
             if fp in servers_list: 
                 continue
             
-            # === 关键修改：只去掉 "Y-" 前缀，其他命名逻辑完全保留 ===
+            # 只去除 "Y-" 前缀，其他命名逻辑完全保留
             original_name = p.get('name', '')
             if original_name.startswith('Y-'):
                 new_name = original_name[2:]          # 去掉 "Y-"
@@ -217,7 +223,7 @@ def parse_server_port(srv):
 # ====================== 主程序 ======================
 if __name__ == "__main__":
     os.makedirs("outputs", exist_ok=True)
-    logger.info("=== ChromeGo Enhanced v3.4 纯 Y 系列版启动（仅去除 Y- 前缀） ===")
+    logger.info("=== ChromeGo Enhanced v3.5 纯 Y 系列版启动（增强 sni 去重 + 去除 Y- 前缀） ===")
 
     # 只处理 Y系列 sources.txt
     process_file("urls/sources.txt")
@@ -228,4 +234,4 @@ if __name__ == "__main__":
         yaml.dump({"proxies": extracted_proxies}, f, allow_unicode=True, sort_keys=False)
 
     logger.info("✅ 输出完成！")
-    logger.info("   输出文件 → outputs/clash_meta.yaml （已去除 Y- 前缀）")
+    logger.info("   输出文件 → outputs/clash_meta.yaml （已去除 Y- 前缀，增强 sni 去重）")
