@@ -2,7 +2,7 @@ name: 自动合并订阅文件
 
 on:
   schedule:
-    - cron: '0 0 * * *'      # 北京时间每天早上 8 点
+    - cron: '0 0 * * *'   # 北京时间每天早上 8 点（UTC 0点）
   workflow_dispatch:
 
 jobs:
@@ -23,30 +23,33 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: 生成最新订阅文件
+      - name: 生成最新订阅文件（按内核名分组输出）
         run: |
           mkdir -p outputs
           python merge_sources.py
+          echo "✅ 订阅文件生成完成，输出目录内容："
+          ls -la outputs/
 
-      - name: 配置 Git 并提交
+      - name: 配置 Git 并提交更新
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # 检查是否有实际变化
-          git add outputs/merged_subscriptions.txt
+          # 添加整个 outputs 目录（包含新增文件、修改文件）
+          git add outputs/
 
+          # 检查是否有实际变更（新增文件或内容修改都会被检测到）
           if git diff --staged --quiet; then
-            echo "📭 订阅内容无变化，跳过提交"
+            echo "📭 outputs/ 目录无任何变化（内容和文件均未更新），跳过提交"
           else
-            echo "📤 检测到更新，正在提交..."
+            echo "📤 检测到 outputs/ 目录有更新（新增或修改文件），正在提交..."
+            
+            # 提交变更
+            git commit -m "🔄 自动更新订阅文件 $(date '+%Y-%m-%d %H:%M:%S')"
 
-            # 先提交本地变更
-            git commit -m "🔄 自动更新合并订阅文件 $(date '+%Y-%m-%d %H:%M:%S')"
-
-            # 再拉取远程最新代码并 rebase
+            # 拉取远程最新代码并 rebase（防止冲突）
             git pull --rebase origin main || echo "⚠️ Pull 出现警告，继续尝试推送"
 
-            # 最终推送（使用 force-with-lease 安全处理）
+            # 推送（使用 force-with-lease 更安全）
             git push --force-with-lease origin main
           fi
