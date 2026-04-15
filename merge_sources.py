@@ -3,6 +3,7 @@ import os
 import re
 from urllib.error import URLError, HTTPError
 
+
 def fetch_url(url: str) -> str:
     """读取订阅地址内容"""
     try:
@@ -25,43 +26,62 @@ def fetch_url(url: str) -> str:
 
 def extract_kernel_name(group_title: str) -> str:
     """
-    从分组标题中提取内核名称
-    支持常见写法：Clash、V2Ray、Xray、Sing-box、Hysteria2、TUIC、Trojan、Shadowsocks 等
+    从分组标题中提取内核/协议名称作为文件名
+    支持 Clash、Quick、Hysteria1/2、Sing-box、Xray、Juicity 等
     """
     title = group_title.lower().strip()
 
-    # 常见内核名称映射（优先匹配更长的关键词）
+    # 名称映射表（优先匹配）
     kernel_map = {
         'clash': 'clash',
         'clash.meta': 'clash',
+        'quick': 'quick',
         'sing-box': 'sing-box',
         'singbox': 'sing-box',
         'v2ray': 'v2ray',
-        'xray': 'v2ray',      # xray 通常也用 v2ray 内核
+        'xray': 'xray',
         'hysteria2': 'hysteria2',
+        'hysteria 2': 'hysteria2',
         'hy2': 'hysteria2',
+        'hysteria1': 'hysteria1',
+        'hysteria': 'hysteria1',   # 默认 Hysteria 分组视为 Hysteria1
         'tuic': 'tuic',
         'trojan': 'trojan',
         'shadowsocks': 'shadowsocks',
         'ss ': 'shadowsocks',
         'ssr': 'shadowsocks',
+        'juicity': 'juicity',
+        'mieru': 'mieru',
+        'naiveproxy': 'naiveproxy',
+        'naive': 'naiveproxy',
+        'shadowquic': 'shadowquic',
     }
 
+    # 先用映射表精确匹配
     for key, kernel in kernel_map.items():
         if key in title:
             return kernel
 
-    # 如果没匹配到，使用正则尝试提取常见单词
-    match = re.search(r'(clash|sing-?box|v2ray|xray|hysteria2?|hy2|tuic|trojan|shadowsocks|ssr)', title)
+    # 正则兜底匹配
+    match = re.search(r'(clash|quick|sing-?box|v2ray|xray|hysteria2?|hy2?|hysteria1?|tuic|trojan|shadowsocks|ssr|juicity|mieru|naiveproxy|naive|shadowquic)', title)
     if match:
         name = match.group(1)
-        return 'sing-box' if name.startswith('sing') else \
-               'hysteria2' if name.startswith('hy') or name == 'hysteria2' else \
-               'v2ray' if name in ('v2ray', 'xray') else \
-               'shadowsocks' if name in ('shadowsocks', 'ssr') else name
+        # 名称规范化
+        if name in ('singbox', 'sing-box'):
+            return 'sing-box'
+        elif name.startswith('hysteria2') or name in ('hy2', 'hysteria 2'):
+            return 'hysteria2'
+        elif name.startswith('hysteria') or name == 'hysteria1':
+            return 'hysteria1'
+        elif name in ('v2ray', 'xray'):
+            return name
+        elif name in ('quick', 'juicity', 'mieru', 'naiveproxy', 'naive', 'shadowquic'):
+            return name
+        return name
 
-    # 默认名称
-    return "nodes"
+    # 最终兜底：取标题中第一个有意义的单词
+    cleaned = re.sub(r'[^a-z0-9]', '', title.split()[0] if title else 'nodes')
+    return cleaned or 'nodes'
 
 
 def sanitize_filename(name: str) -> str:
@@ -99,8 +119,8 @@ def main():
                 current_urls = []
             current_group = None
             continue
-        if current_group is None:
-            current_group = line.rstrip()   # 保留原始标题用于提取内核名
+        if current_group is None and stripped.startswith('#'):
+            current_group = line.rstrip()   # 保留原始标题
             current_urls = []
         else:
             if stripped and not stripped.startswith('#'):
@@ -112,10 +132,10 @@ def main():
     print(f"✅ 共解析到 {len(groups)} 个分组，开始处理...\n")
 
     total = 0
-    kernel_count = {}   # 用于处理同名内核序号
+    kernel_count = {}   # 处理同名内核序号
 
     for group_id, urls in groups:
-        # 从分组标题中提取内核名作为文件名
+        # 提取内核名作为文件名
         kernel_name = extract_kernel_name(group_id)
         
         # 处理同名文件序号
