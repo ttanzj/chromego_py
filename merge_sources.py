@@ -1,94 +1,45 @@
-import urllib.request
-import os
-from urllib.error import URLError, HTTPError
+name: 自动合并订阅文件
 
-def fetch_url(url: str) -> str:
-    """读取订阅地址内容"""
-    try:
-        req = urllib.request.Request(
-            url,
-            headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
-            }
-        )
-        with urllib.request.urlopen(req, timeout=30) as response:
-            if response.getcode() == 200:
-                return response.read().decode('utf-8', errors='replace')
-            else:
-                return f"# 【错误】HTTP {response.getcode()} - {url}\n"
-    except (URLError, HTTPError) as e:
-        return f"# 【错误】无法访问 {url}：{str(e)}\n"
-    except Exception as e:
-        return f"# 【错误】未知异常 {url}：{str(e)}\n"
+on:
+  schedule:
+    - cron: '0 0 * * *'      # 北京时间每天早上 8 点
+  workflow_dispatch:
 
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-def main():
-    input_file = "urls/sources.txt"
-    output_dir = "outputs"
-    output_file = os.path.join(output_dir, "merged_subscriptions.txt")
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    # 检查输入文件
-    if not os.path.exists(input_file):
-        print(f"❌ 未找到 {input_file} 文件！")
-        return
+      - name: 创建输出目录
+        run: mkdir -p outputs
 
-    # 创建 outputs 文件夹（如果不存在）
-    os.makedirs(output_dir, exist_ok=True)
-    print(f"📁 输出文件夹已确认：{output_dir}/")
+      - name: 执行合并脚本
+        run: python merge_sources.py
 
-    # 解析分组
-    groups = []
-    with open(input_file, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-
-    current_group = None
-    current_urls = []
-
-    for line in lines:
-        stripped = line.strip()
-        if stripped == "":  # 空行 = 分组结束
-            if current_group and current_urls:
-                groups.append((current_group, current_urls[:]))
-                current_urls = []
-            current_group = None
-            continue
-
-        if current_group is None:
-            current_group = line.rstrip()  # 保留原始分组名
-            current_urls = []
-        else:
-            if stripped:
-                current_urls.append(stripped)
-
-    # 最后一个分组
-    if current_group and current_urls:
-        groups.append((current_group, current_urls[:]))
-
-    print(f"✅ 共解析到 {len(groups)} 个分组，开始下载...\n")
-
-    # 写入合并文件
-    with open(output_file, "w", encoding="utf-8") as out:
-        out.write("# =======================\n")
-        out.write("# 合并后的订阅文件\n")
-        out.write("# 由 merge_sources.py 自动生成\n")
-        out.write(f"# 输出路径：{output_file}\n")
-        out.write("# =======================\n\n")
-
-        total = 0
-        for group_id, urls in groups:
-            print(f"📂 处理分组：{group_id}  ({len(urls)} 个地址)")
-            for url in urls:
-                print(f"   ⬇️  下载 → {url}")
-                content = fetch_url(url)
-                total += 1
-
-                out.write(f"{group_id}\n")
-                out.write(content)
-                out.write("\n\n")
-
-    print(f"\n🎉 全部完成！共处理 {total} 个订阅")
-    print(f"📄 输出文件路径：{output_file}")
-
-
-if __name__ == "__main__":
-    main()
+      - name: 配置 Git 并提交更新
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 关键修复：先拉取最新代码
+          git pull --rebase origin main
+          
+          if git diff --quiet outputs/merged_subscriptions.txt; then
+            echo "📭 本次订阅内容无变化，跳过提交"
+          else
+            echo "📤 检测到更新，正在提交..."
+            git add outputs/merged_subscriptions.txt
+            git commit -m "🔄 自动更新合并订阅文件 $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+          fi
