@@ -1,0 +1,278 @@
+# =======================
+# 分组标题: # Sing-box
+# 内核类型: sing-box
+# 由 merge_sources.py 自动生成
+# =======================
+
+{
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "sniff": true,
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "hysteria",
+      "tag": "https://github.com/Alvin9999-newpac/fanqiang/wiki",
+      "server": "5.83.129.90", 
+      "server_port": 54177,
+      "up_mbps": 11, 
+      "down_mbps": 55,
+      "auth_str": "dongtaiwang.com",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "server_name": "bing.com", 
+        "alpn": [
+          "h3"
+        ]
+
+      }
+    }
+  ] 
+	 
+}
+
+
+{
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "sniff": true,
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "hysteria",
+      "tag": "dongtaiwang.com",
+      "server": "45.150.65.154", 
+      "server_port": 47119,
+      "up_mbps": 11, 
+      "down_mbps": 55,
+      "auth_str": "dongtaiwang.com",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "server_name": "bing.com", 
+        "alpn": [
+          "h3"
+        ]
+
+      }
+    }
+  ] 
+	 
+}
+
+{
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "sniff": true,
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "hysteria",
+      "tag": "https://github.com/Alvin9999-newpac/fanqiang/wiki",
+      "server": "5.83.129.90", 
+      "server_port": 54177,
+      "up_mbps": 11, 
+      "down_mbps": 55,
+      "auth_str": "dongtaiwang.com",
+      "tls": {
+        "enabled": true,
+        "insecure": true,
+        "server_name": "bing.com", 
+        "alpn": [
+          "h3"
+        ]
+
+      }
+    }
+  ] 
+	 
+}
+
+
+{
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "tuic",
+      "tag": "https://github.com/Alvin9999-newpac/fanqiang",
+      "server": "163.172.116.154",
+      "server_port": 33887,
+      "uuid": "9adb384a-0f16-4501-a8f3-b6b2556fce87",
+      "password": "dongtaiwang.com",
+      "congestion_control": "bbr",
+      "tls": {
+        "enabled": true,
+        "server_name": "bing.com",
+        "alpn": ["h3"],
+        "insecure": true
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "inbound": "mixed-in",
+        "action": "sniff"
+      }
+    ],
+    "final": "https://github.com/Alvin9999-newpac/fanqiang"
+  }
+}
+
+{
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "tuic",
+      "tag": "https://github.com/Alvin9999-newpac/fanqiang",
+      "server": "163.172.116.154",
+      "server_port": 33887,
+      "uuid": "9adb384a-0f16-4501-a8f3-b6b2556fce87",
+      "password": "dongtaiwang.com",
+      "congestion_control": "bbr",
+      "tls": {
+        "enabled": true,
+        "server_name": "bing.com",
+        "alpn": ["h3"],
+        "insecure": true
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "inbound": "mixed-in",
+        "action": "sniff"
+      }
+    ],
+    "final": "https://github.com/Alvin9999-newpac/fanqiang"
+  }
+}
+
+{
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "tuic",
+      "tag": "https://github.com/Alvin9999-newpac/fanqian",
+      "server": "89.144.35.232",
+      "server_port": 17306,
+      "uuid": "3ebac90b-6977-47c0-bef5-b2e37554432c",
+      "password": "3ebac90b-6977-47c0-bef5-b2e37554432c",
+      "congestion_control": "bbr",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.microsoft.com",
+        "alpn": ["h3"],
+        "insecure": true
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "inbound": "mixed-in",
+        "action": "sniff"
+      }
+    ],
+    "final": "https://github.com/Alvin9999-newpac/fanqian"
+  }
+}
+
+{
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "::",
+      "listen_port": 1080,
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "tuic",
+      "tag": "https://github.com/Alvin9999-newpac/fanqian",
+      "server": "89.144.35.232",
+      "server_port": 17306,
+      "uuid": "3ebac90b-6977-47c0-bef5-b2e37554432c",
+      "password": "3ebac90b-6977-47c0-bef5-b2e37554432c",
+      "congestion_control": "bbr",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.microsoft.com",
+        "alpn": ["h3"],
+        "insecure": true
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "inbound": "mixed-in",
+        "action": "sniff"
+      }
+    ],
+    "final": "https://github.com/Alvin9999-newpac/fanqian"
+  }
+}
+

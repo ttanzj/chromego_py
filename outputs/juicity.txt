@@ -1,0 +1,54 @@
+# =======================
+# 分组标题: # Juicity
+# 内核类型: juicity
+# 由 merge_sources.py 自动生成
+# =======================
+
+{
+  "listen": "127.0.0.1:1080",
+    "server": "fan.193919.xyz:45889",
+    "uuid": "abbf6900-2bfb-4019-89e4-4875e831cea8",
+    "password": "dongtaiwang.com",
+    "sni": "fan.193919.xyz",
+    "allow_insecure": true,
+    "congestion_control": "bbr",
+    "log_level": "info"
+}
+
+
+
+{
+  "listen": "127.0.0.1:1080",
+    "server": "fan.193919.xyz:45889",
+    "uuid": "abbf6900-2bfb-4019-89e4-4875e831cea8",
+    "password": "dongtaiwang.com",
+    "sni": "fan.193919.xyz",
+    "allow_insecure": true,
+    "congestion_control": "bbr",
+    "log_level": "info"
+}
+
+
+
+{
+  "listen": "127.0.0.1:1080",
+    "server": "5.83.129.153:22222",
+    "uuid": "4b230023-d64a-4231-b5ca-c38a4546a5d0",
+    "password": "dongtaiwang.com",
+    "sni": "bing.com",
+    "allow_insecure": true,
+    "congestion_control": "bbr",
+    "log_level": "info"
+}
+
+{
+  "listen": "127.0.0.1:1080",
+    "server": "5.83.129.153:22222",
+    "uuid": "4b230023-d64a-4231-b5ca-c38a4546a5d0",
+    "password": "dongtaiwang.com",
+    "sni": "bing.com",
+    "allow_insecure": true,
+    "congestion_control": "bbr",
+    "log_level": "info"
+}
+

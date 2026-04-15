@@ -1,0 +1,138 @@
+# =======================
+# 分组标题: # Mieru
+# 内核类型: mieru
+# 由 merge_sources.py 自动生成
+# =======================
+
+
+
+{
+    "profiles": [
+        {
+            "profileName": "default",
+            "user": {
+                "name": "dongtaiwang.com",
+                "password": "dongtaiwang.com"
+            },
+            "servers": [
+                {
+                    "ipAddress": "45.221.98.11",
+                    "domainName": "",
+                    "portBindings": [
+                        {
+                            "port": 28866,
+                            "protocol": "TCP"
+                        }
+                    ]
+                }
+            ],
+            "mtu": 1400
+        }
+    ],
+    "activeProfile": "default",
+    "rpcPort": 8964,
+    "socks5Port": 3080,
+    "loggingLevel": "INFO"
+}
+
+
+
+
+{
+    "profiles": [
+        {
+            "profileName": "default",
+            "user": {
+                "name": "dongtaiwang.com",
+                "password": "dongtaiwang.com"
+            },
+            "servers": [
+                {
+                    "ipAddress": "45.221.98.11",
+                    "domainName": "",
+                    "portBindings": [
+                        {
+                            "port": 28866,
+                            "protocol": "TCP"
+                        }
+                    ]
+                }
+            ],
+            "mtu": 1400
+        }
+    ],
+    "activeProfile": "default",
+    "rpcPort": 8964,
+    "socks5Port": 3080,
+    "loggingLevel": "INFO"
+}
+
+
+
+
+{
+    "profiles": [
+        {
+            "profileName": "default",
+            "user": {
+                "name": "dongtaiwang.com",
+                "password": "dongtaiwang.com"
+            },
+            "servers": [
+                {
+                    "ipAddress": "62.210.124.132",
+                    "domainName": "",
+                    "portBindings": [
+                        {
+                            "port": 44668,
+                            "protocol": "TCP"
+                        }
+                    ]
+                }
+            ],
+            "mtu": 1400
+        }
+    ],
+    "activeProfile": "default",
+    "rpcPort": 8964,
+    "socks5Port": 3080,
+    "loggingLevel": "INFO"
+}
+
+
+
+
+
+
+{
+    "profiles": [
+        {
+            "profileName": "default",
+            "user": {
+                "name": "dongtaiwang.com",
+                "password": "dongtaiwang.com"
+            },
+            "servers": [
+                {
+                    "ipAddress": "62.210.124.132",
+                    "domainName": "",
+                    "portBindings": [
+                        {
+                            "port": 44668,
+                            "protocol": "TCP"
+                        }
+                    ]
+                }
+            ],
+            "mtu": 1400
+        }
+    ],
+    "activeProfile": "default",
+    "rpcPort": 8964,
+    "socks5Port": 3080,
+    "loggingLevel": "INFO"
+}
+
+
+
+

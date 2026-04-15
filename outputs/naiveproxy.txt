@@ -1,0 +1,30 @@
+# =======================
+# 分组标题: # Naiveproxy
+# 内核类型: naiveproxy
+# 由 merge_sources.py 自动生成
+# =======================
+
+
+{
+  "listen":  "socks://127.0.0.1:1080",
+  "proxy": "https://dongtaiwang.com:dongtaiwang.com@fan.193919.xyz:44000"
+}
+
+
+{
+  "listen":  "socks://127.0.0.1:1080",
+  "proxy": "https://dongtaiwang.com:dongtaiwang.com@fan.193919.xyz:44000"
+}
+
+
+{
+  "listen":  "socks://127.0.0.1:1080",
+  "proxy": "https://dongtaiwang.com:dongtaiwang.com@hk.336892.xyz:33550"
+}
+
+
+{
+  "listen":  "socks://127.0.0.1:1080",
+  "proxy": "https://dongtaiwang.com:dongtaiwang.com@hk.336892.xyz:33550"
+}
+

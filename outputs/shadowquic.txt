@@ -1,0 +1,86 @@
+# =======================
+# 分组标题: # Shadowquic
+# 内核类型: shadowquic
+# 由 merge_sources.py 自动生成
+# =======================
+
+inbound:
+  type: socks
+  bind-addr: "127.0.0.1:4080"
+
+outbound:
+  type: shadowquic
+  addr: "62.210.124.132:1443"
+  username: "dongtaiwang.com"
+  password: "dongtaiwang.com"
+  server-name: "www.yahoo.com"
+  alpn: ["h3"]
+  initial-mtu: 1300
+  congestion-control: bbr
+  zero-rtt: true
+  over-stream: false
+
+log-level: "info"
+
+
+
+inbound:
+  type: socks
+  bind-addr: "127.0.0.1:4080"
+
+outbound:
+  type: shadowquic
+  addr: "62.210.124.132:1443"
+  username: "dongtaiwang.com"
+  password: "dongtaiwang.com"
+  server-name: "www.yahoo.com"
+  alpn: ["h3"]
+  initial-mtu: 1300
+  congestion-control: bbr
+  zero-rtt: true
+  over-stream: false
+
+log-level: "info"
+
+
+
+inbound:
+  type: socks
+  bind-addr: "127.0.0.1:4080"
+
+outbound:
+  type: shadowquic
+  addr: "157.254.223.65:1443"
+  username: "dongtaiwang.com"
+  password: "dongtaiwang.com"
+  server-name: "www.yahoo.com"
+  alpn: ["h3"]
+  initial-mtu: 1300
+  congestion-control: bbr
+  zero-rtt: true
+  over-stream: false
+
+log-level: "info"
+
+
+
+inbound:
+  type: socks
+  bind-addr: "127.0.0.1:4080"
+
+outbound:
+  type: shadowquic
+  addr: "157.254.223.65:1443"
+  username: "dongtaiwang.com"
+  password: "dongtaiwang.com"
+  server-name: "www.yahoo.com"
+  alpn: ["h3"]
+  initial-mtu: 1300
+  congestion-control: bbr
+  zero-rtt: true
+  over-stream: false
+
+log-level: "info"
+
+
+
