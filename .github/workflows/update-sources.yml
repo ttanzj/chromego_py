@@ -1,7 +1,7 @@
 name: 更新订阅地址 sources.txt
 
 on:
-  # 仅手动触发，不会自动运行
+  # 仅支持手动触发，不会自动运行
   workflow_dispatch:
     inputs:
       run_description:
@@ -18,7 +18,7 @@ jobs:
       - name: 检出仓库代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # 拉取完整历史，方便 rebase
+          fetch-depth: 0
 
       - name: 设置 Python 环境
         uses: actions/setup-python@v5
@@ -26,32 +26,32 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: 运行 update_sources.py
+      - name: 运行 update_sources.py 生成最新 sources.txt
         run: |
           python update_sources.py
 
-      - name: 检查 sources.txt 是否有变更
+      - name: 检查 sources.txt 是否有实际变更
         id: git-check
         run: |
           if git diff --quiet HEAD -- urls/sources.txt; then
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "✅ sources.txt 没有变化，无需提交"
+            echo "✅ sources.txt 内容没有变化，无需提交"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "🔄 sources.txt 已更新"
+            echo "🔄 sources.txt 已更新，即将提交"
           fi
 
-      - name: 配置 Git 用户
+      - name: 配置 Git 用户信息
         if: steps.git-check.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: 拉取最新远程代码并 rebase（解决 non-fast-forward）
+      - name: 拉取最新远程代码并 rebase（使用 --autostash 解决 unstaged changes）
         if: steps.git-check.outputs.changed == 'true'
         run: |
-          git pull --rebase origin main
-          echo "✅ 已 rebase 远程最新代码"
+          git pull --rebase --autostash origin main
+          echo "✅ 已成功 rebase 远程最新代码"
 
       - name: 提交并推送更新
         if: steps.git-check.outputs.changed == 'true'
@@ -62,11 +62,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 完成提示
+      - name: 执行结果
         run: |
-          echo "🎉 Workflow 执行完毕！"
+          echo "🎉 Workflow 执行完成！"
           if [ "${{ steps.git-check.outputs.changed }}" = "true" ]; then
-            echo "   sources.txt 已更新并成功推送到 main 分支"
+            echo "   ✅ sources.txt 已更新并推送到 main 分支"
           else
-            echo "   sources.txt 无变化，本次无需提交"
+            echo "   ✅ sources.txt 无变化，本次无需提交"
           fi
