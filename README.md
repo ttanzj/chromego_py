@@ -7,12 +7,6 @@ A python script to extract ChromeGo Proxies
 一个用来提取ChromeGo代理节点的Python脚本
 
 
-</div>
-
-### 未来更新计划
-
-[] 添加更多节点来源
-
 > 鸣谢
 > - 感谢[linzjian666](https://github.com/linzjian666/chromego_extractor)项目是原始项目，Ai大幅改写
 > - 感谢[ChromeGo](https://github.com/bannedbook/fanqiang)项目
@@ -55,14 +49,11 @@ python main.py
 #### 4. 获取代理信息
 脚本将提取 ChromeGo 代理节点信息，并保存到`outputs`目录中，其中sources.txt是Chromego提取出的订阅，sources-j.txt是增加的互联网其他订阅，订阅格式都直接写地址，一行一个，不加其他内容。
 
-#### 5. 其他
-根据需要，你可以自行修改脚本的一些配置，比如保存文件的路径等。
+#### 5. update_sources.py是把edgego、chromego、firefoxfq翻墙软件中的ip_update文件夹上传到项目中，自动提取bat文件中的订阅地址
 
-#### 5. merge_sources.py是将订阅按分类将打开订阅后看到的内容简单叠加汇总，不能做为订阅源被引用。
-
+#### 6. merge_sources.py是将订阅按分类将打开订阅后看到的内容简单叠加汇总，不能做为订阅源被引用。
 
 
-</details>
 
 ## 免责声明
 
