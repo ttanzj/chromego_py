@@ -1,5 +1,5 @@
 # =======================
-# 分组标题: # Naiveproxy
+# 分组标题: # naiveproxy
 # 内核类型: naiveproxy
 # 由 merge_sources.py 自动生成
 # =======================

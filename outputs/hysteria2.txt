@@ -1,169 +1,10 @@
 # =======================
-# 分组标题: # Hysteria2
+# 分组标题: # hysteria2
 # 内核类型: hysteria2
 # 由 merge_sources.py 自动生成
 # =======================
 
 {
-  "server": "[2001:bc8:32d7:17b::8]:22000",
-  "auth": "dongtaiwang.com",
-  "tls": {
-    "sni": "apple.com",
-    "insecure": true
-  },
-  "transport": {
-    "type": "udp",
-    "udp": {
-      "hopInterval": "300s"
-    }
-  },
-  "quic": {
-    "initStreamReceiveWindow": 3520000,
-    "initConnReceiveWindow": 8800000,
-    "maxConnReceiveWindow": 13200000,
-    "maxStreamReceiveWindow": 5280000,
-    "keepAlivePeriod": "60s"
-  },
-  "bandwidth": {
-    "up": "11 mbps",
-    "down": "55 mbps"
-  },
-  "fastOpen": true,
-  "lazy": true,
-  "socks5": {
-    "listen": "127.0.0.1:1080"
-  }
-}
-
-{
-  "server": "[2001:bc8:32d7:17b::8]:22000",
-  "auth": "dongtaiwang.com",
-  "tls": {
-    "sni": "apple.com",
-    "insecure": true
-  },
-  "transport": {
-    "type": "udp",
-    "udp": {
-      "hopInterval": "300s"
-    }
-  },
-  "quic": {
-    "initStreamReceiveWindow": 3520000,
-    "initConnReceiveWindow": 8800000,
-    "maxConnReceiveWindow": 13200000,
-    "maxStreamReceiveWindow": 5280000,
-    "keepAlivePeriod": "60s"
-  },
-  "bandwidth": {
-    "up": "11 mbps",
-    "down": "55 mbps"
-  },
-  "fastOpen": true,
-  "lazy": true,
-  "socks5": {
-    "listen": "127.0.0.1:1080"
-  }
-}
-
-{
-  "server": "[2001:bc8:32d7:17b::8]:22000",
-  "auth": "dongtaiwang.com",
-  "tls": {
-    "sni": "apple.com",
-    "insecure": true
-  },
-  "transport": {
-    "type": "udp",
-    "udp": {
-      "hopInterval": "300s"
-    }
-  },
-  "quic": {
-    "initStreamReceiveWindow": 3520000,
-    "initConnReceiveWindow": 8800000,
-    "maxConnReceiveWindow": 13200000,
-    "maxStreamReceiveWindow": 5280000,
-    "keepAlivePeriod": "60s"
-  },
-  "bandwidth": {
-    "up": "11 mbps",
-    "down": "55 mbps"
-  },
-  "fastOpen": true,
-  "lazy": true,
-  "socks5": {
-    "listen": "127.0.0.1:1080"
-  }
-}
-
-{
-  "server": "[2001:bc8:32d7:17b::8]:22000",
-  "auth": "dongtaiwang.com",
-  "tls": {
-    "sni": "apple.com",
-    "insecure": true
-  },
-  "transport": {
-    "type": "udp",
-    "udp": {
-      "hopInterval": "300s"
-    }
-  },
-  "quic": {
-    "initStreamReceiveWindow": 3520000,
-    "initConnReceiveWindow": 8800000,
-    "maxConnReceiveWindow": 13200000,
-    "maxStreamReceiveWindow": 5280000,
-    "keepAlivePeriod": "60s"
-  },
-  "bandwidth": {
-    "up": "11 mbps",
-    "down": "55 mbps"
-  },
-  "fastOpen": true,
-  "lazy": true,
-  "socks5": {
-    "listen": "127.0.0.1:1080"
-  }
-}
-
-{
-  "server": "[2001:bc8:32d7:302::11]:20088",
-  "auth": "dongtaiwang.com",
-  "tls": {
-    "sni": "apple.com",
-    "insecure": true
-  },
-  "transport": {
-    "type": "udp",
-    "udp": {
-      "hopInterval": "300s"
-    }
-  },
-  "quic": {
-    "initStreamReceiveWindow": 3520000,
-    "initConnReceiveWindow": 8800000,
-    "maxConnReceiveWindow": 13200000,
-    "maxStreamReceiveWindow": 5280000,
-    "keepAlivePeriod": "60s"
-  },
-  "bandwidth": {
-    "up": "11 mbps",
-    "down": "55 mbps"
-  },
-  "fastOpen": true,
-  "lazy": true,
-  "socks5": {
-    "listen": "127.0.0.1:1080"
-  }
-}
-
-
-# 【错误】无法访问 https://www.githubip.xyz/Alvin9999/pac2/master/hysteria2/2/config.yaml：HTTP Error 404: Not Found
-
-
-{
   "server": "157.254.223.43:27921,28000-29000",
   "auth": "dongtaiwang.com",
   "bandwidth": {
@@ -220,6 +61,62 @@
 
 
 {
+  "server": "[2001:bc8:32d7:17b::3]:22000",
+  "auth": "dongtaiwang.com",
+  "bandwidth": {
+    "up": "11 mbps",
+    "down": "55 mbps"
+  },
+  "tls": {
+    "sni": "www.microsoft.com",
+    "insecure": true
+  },
+  "quic": {
+    "initStreamReceiveWindow": 16777216,
+    "maxStreamReceiveWindow": 16777216,
+    "initConnReceiveWindow": 33554432,
+    "maxConnReceiveWindow": 33554432
+  },
+  "socks5": {
+    "listen": "127.0.0.1:1080"
+  },
+  "transport": {
+    "udp": {
+      "hopInterval": "30s"
+    }
+  }
+}
+
+
+{
+  "server": "[2001:bc8:32d7:17b::3]:22000",
+  "auth": "dongtaiwang.com",
+  "bandwidth": {
+    "up": "11 mbps",
+    "down": "55 mbps"
+  },
+  "tls": {
+    "sni": "www.microsoft.com",
+    "insecure": true
+  },
+  "quic": {
+    "initStreamReceiveWindow": 16777216,
+    "maxStreamReceiveWindow": 16777216,
+    "initConnReceiveWindow": 33554432,
+    "maxConnReceiveWindow": 33554432
+  },
+  "socks5": {
+    "listen": "127.0.0.1:1080"
+  },
+  "transport": {
+    "udp": {
+      "hopInterval": "30s"
+    }
+  }
+}
+
+
+{
   "server": "[2a10:3c80:0:f::2]:39463",
   "auth": "VNws548Lj/fDRk58HE6dKAcTNpb8+iIk+ycqKEBNG/U=",
   "bandwidth": {
@@ -251,62 +148,6 @@
 {
   "server": "[2a10:3c80:0:f::2]:39463",
   "auth": "VNws548Lj/fDRk58HE6dKAcTNpb8+iIk+ycqKEBNG/U=",
-  "bandwidth": {
-    "up": "11 mbps",
-    "down": "55 mbps"
-  },
-  "tls": {
-    "sni": "www.microsoft.com",
-    "insecure": true
-  },
-  "quic": {
-    "initStreamReceiveWindow": 16777216,
-    "maxStreamReceiveWindow": 16777216,
-    "initConnReceiveWindow": 33554432,
-    "maxConnReceiveWindow": 33554432
-  },
-  "socks5": {
-    "listen": "127.0.0.1:1080"
-  },
-  "transport": {
-    "udp": {
-      "hopInterval": "30s"
-    }
-  }
-}
-
-
-{
-  "server": "[2001:bc8:32d7:17b::3]:22000",
-  "auth": "dongtaiwang.com",
-  "bandwidth": {
-    "up": "11 mbps",
-    "down": "55 mbps"
-  },
-  "tls": {
-    "sni": "www.microsoft.com",
-    "insecure": true
-  },
-  "quic": {
-    "initStreamReceiveWindow": 16777216,
-    "maxStreamReceiveWindow": 16777216,
-    "initConnReceiveWindow": 33554432,
-    "maxConnReceiveWindow": 33554432
-  },
-  "socks5": {
-    "listen": "127.0.0.1:1080"
-  },
-  "transport": {
-    "udp": {
-      "hopInterval": "30s"
-    }
-  }
-}
-
-
-{
-  "server": "[2001:bc8:32d7:17b::3]:22000",
-  "auth": "dongtaiwang.com",
   "bandwidth": {
     "up": "11 mbps",
     "down": "55 mbps"

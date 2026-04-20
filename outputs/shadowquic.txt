@@ -1,5 +1,5 @@
 # =======================
-# 分组标题: # Shadowquic
+# 分组标题: # shadowquic
 # 内核类型: shadowquic
 # 由 merge_sources.py 自动生成
 # =======================
