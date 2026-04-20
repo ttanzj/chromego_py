@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
+          # 已移除 cache: 'pip'，避免无依赖时产生警告
 
       - name: 运行 update_sources.py 生成最新 sources.txt
         run: |
@@ -47,7 +47,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: 拉取最新远程代码并 rebase（使用 --autostash 解决 unstaged changes）
+      - name: 拉取最新远程代码并 rebase（自动处理冲突）
         if: steps.git-check.outputs.changed == 'true'
         run: |
           git pull --rebase --autostash origin main
@@ -66,7 +66,7 @@ jobs:
         run: |
           echo "🎉 Workflow 执行完成！"
           if [ "${{ steps.git-check.outputs.changed }}" = "true" ]; then
-            echo "   ✅ sources.txt 已更新并推送到 main 分支"
+            echo "   ✅ sources.txt 已更新并成功推送到 main 分支"
           else
             echo "   ✅ sources.txt 无变化，本次无需提交"
           fi
