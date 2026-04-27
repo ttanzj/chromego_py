@@ -50,7 +50,7 @@ inbound:
 
 outbound:
   type: shadowquic
-  addr: "157.254.223.65:1443"
+  addr: "157.254.223.64:1443"
   username: "dongtaiwang.com"
   password: "dongtaiwang.com"
   server-name: "www.yahoo.com"
@@ -70,7 +70,7 @@ inbound:
 
 outbound:
   type: shadowquic
-  addr: "157.254.223.65:1443"
+  addr: "157.254.223.64:1443"
   username: "dongtaiwang.com"
   password: "dongtaiwang.com"
   server-name: "www.yahoo.com"
