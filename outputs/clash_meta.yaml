@@ -180,3 +180,27 @@ proxies:
   - h3
   up: 100
   down: 100
+- name: DE-HYSTERIA-1
+  type: hysteria
+  server: 5.83.129.143
+  port: 26691
+  auth-str: dongtaiwang.com
+  sni: apple.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+  protocol: udp
+  up: 11 Mbps
+  down: 55 Mbps
+- name: UNK-HYSTERIA-1
+  type: hysteria
+  server: 2a14:7584:d099::a
+  port: 26691
+  auth-str: dongtaiwang.com
+  sni: apple.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+  protocol: udp
+  up: 11 Mbps
+  down: 55 Mbps
