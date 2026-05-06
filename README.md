@@ -19,7 +19,7 @@
 #### 1. main.py用来提取节点并推送，main.yml自动每天运行。
 
 #### 2. 获取代理信息
-脚本将提取 ChromeGo 代理节点信息，并保存到`outputs`目录中，其中sources.txt是Chromego提取出的订阅，订阅格式都直接写地址，一行一个，不加其他内容。
+脚本将提取 ChromeGo 代理节点信息，并保存到`outputs`目录中，其中sources.txt是Chromego提取出的订阅，订阅格式都直接写地址，一行一个，不加其他内容。extra_sources.txt是早期版本的订阅地址，现在版里已弃用，但有的仍能得到节点。
 
 #### 3. update_sources.py是把edgego、chromego、firefoxfq翻墙软件中的ip_update文件夹上传到项目中，自动提取bat文件中的订阅地址，update_soures.yml手动触发。
 
