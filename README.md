@@ -23,7 +23,7 @@
 
 #### 3. update_sources.py是把edgego、chromego、firefoxfq翻墙软件中的ip_update文件夹上传到项目中，自动提取bat文件中的订阅地址，update_soures.yml手动触发。
 
-#### 4. merge_sources.py是将订阅按分类将打开订阅后看到的内容简单叠加汇总，不能做为订阅源被引用，merge-subscriptions.yml手动触发。
+#### 4. merge_sources.py是将订阅按分类将打开订阅后看到的内容简单叠加汇总，不能做为订阅源被引用，merge-subscriptions.yml每天自动运行。
 
 
 
