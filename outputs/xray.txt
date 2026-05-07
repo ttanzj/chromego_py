@@ -42,7 +42,7 @@
       "settings": {
         "vnext": [
           {
-            "address": "118.166.39.3", "port": 44965,
+            "address": "118.166.29.38", "port": 44965,
             "users": [
               {
                 "id": "b0a4c3bf-f170-46e2-8cef-7ed2fc2e6748",
@@ -121,7 +121,7 @@
       "settings": {
         "vnext": [
           {
-            "address": "118.166.39.3", "port": 44965,
+            "address": "118.166.29.38", "port": 44965,
             "users": [
               {
                 "id": "b0a4c3bf-f170-46e2-8cef-7ed2fc2e6748",
